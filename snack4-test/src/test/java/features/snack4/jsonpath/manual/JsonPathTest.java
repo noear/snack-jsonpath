@@ -3,6 +3,7 @@ package features.snack4.jsonpath.manual;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.noear.snack4.ONode;
+import org.noear.snack4.codec.TypeRef;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,9 @@ public class JsonPathTest extends AbsQueryTest{
         //4.获取一个数组
         //List<Integer> list = n.get("data").get("list").toBean(List.class);
         List<Integer> list = select(n, "$.data.list").toBean(new ArrayList<Integer>(){}.getClass());
+        assertEquals(5, list.size());
+
+        list = select(n, "$.data.list").toBean(TypeRef.listOf(Integer.class));
         assertEquals(5, list.size());
 
 

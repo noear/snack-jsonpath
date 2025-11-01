@@ -672,25 +672,8 @@ public final class ONode {
         return toBean(Object.class);
     }
 
-    public <T> List<T> toBeanList(Type type) {
-        if (isArray()) {
-            List<T> list = new ArrayList<>(this.getArrayUnsafe().size());
-            for (ONode n : this.getArrayUnsafe()) {
-                list.add(BeanDecoder.decode(n, type, null, options));
-            }
-            return list;
-        } else {
-            return Collections.emptyList();
-        }
-    }
-
-    public <T> List<T> toBeanList(TypeRef<T> typeRef) {
-        return toBeanList(typeRef.getType());
-    }
-
     /**
      * @deprecated 4.0
-     *
      */
     @Deprecated
     public <T> T toData() {
