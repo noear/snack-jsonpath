@@ -255,9 +255,29 @@ public class GenericTest {
     }
 
     @Test
+    public <K, V extends List> void test11_2() {
+        String json = "{a:[1],b:[2,4]}";
+        Map map = ONode.ofJson(json).toBean(new TypeRef<Map<K, V>>() {
+        }.where("K", String.class).where("V", TypeRef.listOf(Long.class).getType()));
+
+        assert map != null;
+        assert ((List) map.get("a")).get(0) instanceof Long;
+    }
+
+    @Test
     public void test12() {
         String json = "{a:1,b:2}";
         Map<String, Long> map = ONode.ofJson(json).toBean(TypeRef.mapOf(String.class, Long.class));
+
+        assert map != null;
+        assert map.get("a") instanceof Long;
+    }
+
+    @Test
+    public <V> void test12_2() {
+        String json = "{a:1,b:2}";
+        Map map = ONode.ofJson(json).toBean(new TypeRef<Map<String, V>>() {
+        }.where("V", Long.class));
 
         assert map != null;
         assert map.get("a") instanceof Long;

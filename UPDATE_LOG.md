@@ -1,4 +1,9 @@
 
+### 4.0.7
+
+* 添加 TypeRef:listOf, setOf,mapOf 方法
+* eggg 升为 1.0.3
+
 ### 4.0.6
 
 * 调整 Read_ConvertSnakeToCamel 特性更名为 Read_ConvertSnakeToSmlCamel
