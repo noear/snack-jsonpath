@@ -21,6 +21,7 @@ import org.noear.snack4.codec.TypeRef;
 import org.noear.snack4.codec.util.DateUtil;
 import org.noear.snack4.json.JsonReader;
 import org.noear.snack4.json.JsonWriter;
+import org.noear.snack4.json.util.FormatUtil;
 import org.noear.snack4.jsonpath.JsonPathProvider;
 import org.noear.snack4.jsonpath.PathSource;
 import org.noear.snack4.util.Asserts;
@@ -843,35 +844,14 @@ public final class ONode {
     }
 
     ///
-    ///
-    ///
+
+    /**
+     * @deprecated 4.0 {@link FormatUtil#hasNestedJsonBlock(String)}
+     *
+     */
+    @Deprecated
     public static boolean hasNestedJson(String str) {
-        if (str == null || str.isEmpty()) {
-            return false;
-        }
-
-        int start = 0;
-        int end = str.length() - 1;
-
-        // 跳过开头空白
-        while (start <= end && Character.isWhitespace(str.charAt(start))) {
-            start++;
-        }
-
-        // 跳过结尾空白
-        while (end >= start && Character.isWhitespace(str.charAt(end))) {
-            end--;
-        }
-
-        // 检查有效长度
-        if (start >= end) {
-            return false;
-        }
-
-        char first = str.charAt(start);
-        char last = str.charAt(end);
-
-        return (first == '{' && last == '}') || (first == '[' && last == ']');
+        return FormatUtil.hasNestedJsonBlock(str);
     }
 
     public static String serialize(Object object, Feature... features) {
