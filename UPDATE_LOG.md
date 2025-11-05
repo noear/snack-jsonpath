@@ -2,6 +2,8 @@
 ### 4.0.7
 
 * 添加 TypeRef:listOf, setOf,mapOf 方法
+* 添加 EgggUtil:getClassEggg 方法
+* 优化 ONode:setAll, addAll 允许传入 null（兼容 snack3）
 * eggg 升为 1.0.3
 
 ### 4.0.6
