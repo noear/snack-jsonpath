@@ -846,26 +846,32 @@ public final class ONode {
     ///
     ///
     public static boolean hasNestedJson(String str) {
-        if (str == null) {
+        if (str == null || str.isEmpty()) {
             return false;
         }
 
-        String trimmed = str.trim();
+        int start = 0;
+        int end = str.length() - 1;
 
-        if (trimmed.isEmpty()) {
+        // 跳过开头空白
+        while (start <= end && Character.isWhitespace(str.charAt(start))) {
+            start++;
+        }
+
+        // 跳过结尾空白
+        while (end >= start && Character.isWhitespace(str.charAt(end))) {
+            end--;
+        }
+
+        // 检查有效长度
+        if (start >= end) {
             return false;
         }
 
-        if(trimmed.length() < 2){
-            return false;
-        }
+        char first = str.charAt(start);
+        char last = str.charAt(end);
 
-        char first = trimmed.charAt(0);
-        char last = trimmed.charAt(trimmed.length() - 1);
-
-        // 检查首尾字符
-        return (first == '{' && last == '}') ||
-                (first == '[' && last == ']');
+        return (first == '{' && last == '}') || (first == '[' && last == ']');
     }
 
     public static String serialize(Object object, Feature... features) {
