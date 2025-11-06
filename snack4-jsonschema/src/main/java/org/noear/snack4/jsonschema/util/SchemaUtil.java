@@ -53,28 +53,28 @@ public class SchemaUtil {
     /**
      * 属性申明
      * */
-    public static PropertyDesc propertyOf(AnnotatedElement ae) {
+    public static PropertyDesc propertyOf(AnnotatedElement ae, TypeEggg typeEggg) {
         ONodeAttr p1Anno = ae.getAnnotation(ONodeAttr.class);
 
         if (p1Anno == null) {
             if (ae instanceof Parameter) {
                 Parameter p1 = (Parameter) ae;
                 String name = p1.getName();
-                return new PropertyDesc(name, p1.getParameterizedType(), false, "");
+                return new PropertyDesc(name, typeEggg.getGenericType(), false, "");
             } else {
                 Field p1 = (Field) ae;
                 String name = p1.getName();
-                return new PropertyDesc(name, p1.getGenericType(), false, "");
+                return new PropertyDesc(name, typeEggg.getGenericType(), false, "");
             }
         } else {
             if (ae instanceof Parameter) {
                 Parameter p1 = (Parameter) ae;
                 String name = nameOr(p1Anno.name(), p1.getName());
-                return new PropertyDesc(name, p1.getParameterizedType(), p1Anno.required(), p1Anno.description());
+                return new PropertyDesc(name, typeEggg.getGenericType(), p1Anno.required(), p1Anno.description());
             } else {
                 Field p1 = (Field) ae;
                 String name = nameOr(p1Anno.name(), p1.getName());
-                return new PropertyDesc(name, p1.getGenericType(), p1Anno.required(), p1Anno.description());
+                return new PropertyDesc(name, typeEggg.getGenericType(), p1Anno.required(), p1Anno.description());
             }
         }
     }
@@ -133,7 +133,7 @@ public class SchemaUtil {
     public static ONode buildTypeSchemaNode(Type type, String description, ONode schemaNode) {
         if (type instanceof ParameterizedType) {
             //处理 ParameterizedType 类型（泛型），如 List<T>、Map<K,V>、Optional<T> 等
-            handleParameterizedType((ParameterizedType) type, description, schemaNode);
+            handleParameterizedType(EgggUtil.getTypeEggg(type), description, schemaNode);
         } else if (type instanceof Class<?>) {
             //处理普通 Class 类型：数组、枚举、POJO 等
             handleClassType((Class<?>) type, description, schemaNode);
@@ -178,38 +178,36 @@ public class SchemaUtil {
     /**
      * 处理 ParameterizedType 类型（如 Result<T>、List<T>、Map<K,V> 等），并自动识别并解析带泛型字段的包装类（保留结构并替换泛型类型）
      */
-    private static void handleParameterizedType(ParameterizedType pt, String description, ONode schemaNode) {
-        Type rawType = pt.getRawType();
-        if (!(rawType instanceof Class<?>)) {
+    private static void handleParameterizedType(TypeEggg typeEggg, String description, ONode schemaNode) {
+        if (!(typeEggg.getType() instanceof Class<?>)) {
             schemaNode.set("type", TYPE_OBJECT);
             return;
         }
 
-        Class<?> clazz = (Class<?>) rawType;
 
         // —— 1. 泛型集合 List<T> / Set<T> ——
-        if (Collection.class.isAssignableFrom(clazz)) {
-            handleGenericCollection(pt, schemaNode);
+        if (Collection.class.isAssignableFrom(typeEggg.getType())) {
+            handleGenericCollection(typeEggg, schemaNode);
             return;
         }
 
         // —— 2. 泛型 Map<K,V> ——
-        if (Map.class.isAssignableFrom(clazz)) {
-            handleGenericMap(pt, schemaNode);
+        if (Map.class.isAssignableFrom(typeEggg.getType())) {
+            handleGenericMap(typeEggg, schemaNode);
             return;
         }
 
         // —— 3. Optional<T> ——
-        if (isOptionalType(rawType)) {
-            buildTypeSchemaNode(pt.getActualTypeArguments()[0], description, schemaNode);
+        if (isOptionalType(typeEggg.getType())) {
+            buildTypeSchemaNode(typeEggg.getActualTypeArguments()[0], description, schemaNode);
             return;
         }
 
         // —— 4. 泛型包装类 ——
-        TypeVariable<?>[] typeParams = clazz.getTypeParameters();
-        Type[] actualTypes = pt.getActualTypeArguments();
+        TypeVariable<?>[] typeParams = typeEggg.getType().getTypeParameters();
+        Type[] actualTypes = typeEggg.getActualTypeArguments();
         if (typeParams.length == actualTypes.length) {
-            resolveGenericClassWithTypeArgs(clazz, actualTypes, schemaNode);
+            resolveGenericClassWithTypeArgs(typeEggg, actualTypes, schemaNode);
             return;
         }
 
@@ -221,8 +219,8 @@ public class SchemaUtil {
     /**
      * 解析带泛型的类结构（如 Result<T>）：
      */
-    private static void resolveGenericClassWithTypeArgs(Class<?> clazz, Type[] actualTypes, ONode schemaNode) {
-        TypeVariable<?>[] typeParams = clazz.getTypeParameters();
+    private static void resolveGenericClassWithTypeArgs(TypeEggg typeEggg, Type[] actualTypes, ONode schemaNode) {
+        TypeVariable<?>[] typeParams = typeEggg.getType().getTypeParameters();
         Map<String, Type> typeVarMap = new HashMap<>();
 
         // 构造泛型变量替换映射，如 T -> List<XX>
@@ -233,8 +231,12 @@ public class SchemaUtil {
         schemaNode.set("type", TYPE_OBJECT);
         ONode props = schemaNode.getOrNew("properties");
 
-        for (Field field : clazz.getDeclaredFields()) {
-            Type fieldType = field.getGenericType();
+        for (FieldEggg fe : typeEggg.getClassEggg().getAllFieldEgggs()) {
+            if(fe.isStatic() || fe.isTransient()){
+                continue;
+            }
+
+            Type fieldType = fe.getGenericType();
 
             // 如果字段类型是泛型变量 T，替换为实际类型
             if (fieldType instanceof TypeVariable<?> && typeVarMap.containsKey(((TypeVariable<?>) fieldType).getName())) {
@@ -245,7 +247,7 @@ public class SchemaUtil {
             // 构建字段 schema 结构
             ONode fieldSchema = new ONode();
             buildTypeSchemaNode(fieldType, null, fieldSchema);
-            props.set(field.getName(), fieldSchema);
+            props.set(fe.getName(), fieldSchema);
         }
     }
 
@@ -314,9 +316,9 @@ public class SchemaUtil {
     /**
      * 处理泛型集合类型：List<T>
      */
-    private static void handleGenericCollection(ParameterizedType pt, ONode schemaNode) {
+    private static void handleGenericCollection(TypeEggg typeEggg, ONode schemaNode) {
         schemaNode.set("type", TYPE_ARRAY);
-        Type[] actualTypeArguments = pt.getActualTypeArguments();
+        Type[] actualTypeArguments = typeEggg.getActualTypeArguments();
         if (actualTypeArguments.length > 0) {
             buildTypeSchemaNode(actualTypeArguments[0], null, schemaNode.getOrNew("items"));
         }
@@ -326,7 +328,7 @@ public class SchemaUtil {
     /**
      * 处理泛型 Map 类型：Map<K, V>
      */
-    private static void handleGenericMap(ParameterizedType pt, ONode schemaNode) {
+    private static void handleGenericMap(TypeEggg typeEggg, ONode schemaNode) {
         schemaNode.set("type", TYPE_OBJECT);
 //        Type[] actualTypeArguments = pt.getActualTypeArguments();
 //        if (actualTypeArguments.length == 2) {
@@ -364,12 +366,12 @@ public class SchemaUtil {
             propertiesNode.asObject();
            TypeEggg typeEggg =  EgggUtil.getTypeEggg(clazz);
 
-            for (FieldEggg fw : typeEggg.getClassEggg().getAllFieldEgggs()) {
-                if(fw.isStatic()){
+            for (FieldEggg fe : typeEggg.getClassEggg().getAllFieldEgggs()) {
+                if(fe.isStatic()){
                     continue;
                 }
 
-                PropertyDesc fp = propertyOf(fw.getField());
+                PropertyDesc fp = propertyOf(fe.getField(), fe.getTypeEggg());
 
                 if (fp != null) {
                     propertiesNode.getOrNew(fp.name()).then(paramNode -> {
