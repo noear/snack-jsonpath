@@ -45,11 +45,7 @@ public class _EnumPatternEncoder implements ObjectPatternEncoder<Enum> {
         if (o != null) {
             return target.setValue(o);
         } else {
-            if (ctx.hasFeature(Feature.Write_EnumUsingToString)) {
-                return target.setValue(value.toString());
-            } else if (ctx.hasFeature(Feature.Write_EnumUsingName)) {
-                return target.setValue(value.name());
-            } else if (ctx.hasFeature(Feature.Write_EnumShapeAsObject)) {
+            if (ctx.hasFeature(Feature.Write_EnumShapeAsObject)) {
                 for (FieldEggg fe : EgggUtil.getClassEggg(value.getClass()).getAllFieldEgggs()) {
                     if (fe.isStatic() ||
                             fe.isTransient() ||
@@ -61,7 +57,16 @@ public class _EnumPatternEncoder implements ObjectPatternEncoder<Enum> {
                     target.set(fe.getAlias(), fe.getValue(value));
                 }
 
-                return target;
+                if (target.isObject()) {
+                    //说明上面有 set 进去了
+                    return target;
+                }
+            }
+
+            if (ctx.hasFeature(Feature.Write_EnumUsingToString)) {
+                return target.setValue(value.toString());
+            } else if (ctx.hasFeature(Feature.Write_EnumUsingName)) {
+                return target.setValue(value.name());
             } else {
                 return target.setValue(value.ordinal());
             }

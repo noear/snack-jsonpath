@@ -1,7 +1,7 @@
 
 ### 4.0.10
 
-* 添加 Write_EnumShapeAsObject 特性
+* 添加 _EnumPatternEncoder 支持 Write_EnumShapeAsObject 特性（可以把 Enum 转为 Json Object）//只适合小范围使用
 * 优化 _EnumPatternDecoder 添加 `ONodeCreator` 表态方法
 * eggg 升为 1.0.5
 
