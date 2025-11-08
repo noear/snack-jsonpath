@@ -195,6 +195,11 @@ public enum Feature {
     Write_EnumUsingToString,
 
     /**
+     * 写入时枚举形状为对象
+     */
+    Write_EnumShapeAsObject,
+
+    /**
      * 写入布尔时转为数字
      * */
     Write_BooleanAsNumber,
