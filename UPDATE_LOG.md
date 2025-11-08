@@ -1,4 +1,8 @@
 
+### 4.0.9
+
+* 修复 issue-ID5NQL parseKeyword 可能越界的问题
+
 ### 4.0.8
 
 * 移除 ONode:hasNestedJson 方法
