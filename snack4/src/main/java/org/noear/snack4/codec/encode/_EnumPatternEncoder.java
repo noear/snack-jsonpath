@@ -51,7 +51,8 @@ public class _EnumPatternEncoder implements ObjectPatternEncoder<Enum> {
                 return target.setValue(value.name());
             } else if (ctx.hasFeature(Feature.Write_EnumShapeAsObject)) {
                 for (FieldEggg fe : EgggUtil.getClassEggg(value.getClass()).getAllFieldEgggs()) {
-                    if (fe.isStatic() || fe.isTransient() ||
+                    if (fe.isStatic() ||
+                            fe.isTransient() ||
                             fe.<ONodeAttrHolder>getDigest().isEncode() == false ||
                             fe.getField().getDeclaringClass() == Enum.class) {
                         continue;

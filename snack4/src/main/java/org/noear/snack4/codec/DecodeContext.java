@@ -31,15 +31,13 @@ public class DecodeContext<T> {
     private final Options options;
     private final ONodeAttrHolder attr;
     private final T target;
-    private final Class<?> type;
-    private final Type genericType;
+    private final TypeEggg typeEggg;
 
     public DecodeContext(Options options, ONodeAttrHolder attr, T target, TypeEggg typeEggg) {
         this.options = options;
         this.attr = attr;
         this.target = target;
-        this.type = typeEggg.getType();
-        this.genericType = typeEggg.getGenericType();
+        this.typeEggg = typeEggg;
     }
 
     public Options getOptions() {
@@ -54,12 +52,16 @@ public class DecodeContext<T> {
         return target;
     }
 
+    public TypeEggg getTypeEggg() {
+        return typeEggg;
+    }
+
     public Class<?> getType() {
-        return type;
+        return typeEggg.getType();
     }
 
     public Type getGenericType() {
-        return genericType;
+        return typeEggg.getGenericType();
     }
 
     public boolean hasFeature(Feature feature) {

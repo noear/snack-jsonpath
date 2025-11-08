@@ -1,7 +1,9 @@
 
 ### 4.0.10
 
-* eggg 升为 1.0.4
+* 添加 Write_EnumShapeAsObject 特性
+* 优化 _EnumPatternDecoder 添加 `ONodeCreator` 表态方法
+* eggg 升为 1.0.5
 
 ### 4.0.9
 

@@ -15,6 +15,8 @@
  */
 package org.noear.snack4.codec.decode;
 
+import org.noear.eggg.ConstrEggg;
+import org.noear.eggg.ParamEggg;
 import org.noear.snack4.ONode;
 import org.noear.snack4.codec.DecodeContext;
 import org.noear.snack4.codec.ObjectPatternDecoder;
@@ -35,33 +37,58 @@ public class _EnumPatternDecoder implements ObjectPatternDecoder<Object> {
 
     @Override
     public Object decode(DecodeContext ctx, ONode node) {
-        EnumWrap ew = EnumWrap.from(ctx.getType());
+        ConstrEggg constrEggg = ctx.getTypeEggg().getClassEggg().getCreator();
+        Enum eItem = null;
 
-        //尝试自定义获取
-        String vs = node.getString();
+        if (constrEggg != null && constrEggg.isStatic()) {
+            if (constrEggg.getParamCount() != 1) {
+                throw new SnackException("Enum creator must be 1 param: " + ctx.getType().getTypeName());
+            }
 
-        Enum eItem;
+            try {
+                ParamEggg p1 = constrEggg.getParamEgggAt(0);
+                Object arg1;
 
-        if (ew.hasCustom()) {
-            //按自定义获取
-            eItem = ew.getCustom(vs);
-            // 获取不到则按名字获取
-            if (eItem == null) {
-                eItem = ew.get(vs);
+                if (node.isObject()) {
+                    //可能是对象
+                    arg1 = node.get(p1.getName()).toBean(p1.getType());
+                } else {
+                    //否则作单值处理
+                    arg1 = node.toBean(p1.getType());
+                }
+
+                eItem = constrEggg.newInstance(arg1);
+            } catch (Exception e) {
+                throw new SnackException(
+                        "Decode failure for '" + ctx.getType().getTypeName() +
+                                "' from value: " + node.getString(), e);
             }
         } else {
-            if (node.isString()) {
-                //按名字获取
-                eItem = ew.get(vs);
+            EnumWrap ew = EnumWrap.from(ctx.getType());
+
+            //尝试自定义获取
+            if (ew.hasCustom()) {
+                //按自定义获取
+                eItem = ew.getCustom(node.getString());
+                // 获取不到则按名字获取
+                if (eItem == null) {
+                    eItem = ew.get(node.getString());
+                }
             } else {
-                //按顺序位获取
-                eItem = ew.get(node.getInt());
+                if (node.isNumber()) {
+                    //按顺序位获取
+                    eItem = ew.get(node.getInt());
+                } else {
+                    //按名字获取
+                    eItem = ew.get(node.getString());
+                }
             }
         }
 
         if (eItem == null) {
             throw new SnackException(
-                    "Deserialize failure for '" + ew.enumClass().getName() + "' from value: " + vs);
+                    "Decode failure for '" + ctx.getType().getTypeName() +
+                            "' from value: " + node.getString());
         }
 
         return eItem;
