@@ -20,7 +20,6 @@ public class EnumTest {
     public void case11() {
         String json = ONode.serialize(user);
         System.out.println(json);
-
         Assertions.assertEquals("{\"name\":\"Pack_xg\",\"age\":33,\"gender\":1}", json);
     }
 
@@ -34,6 +33,14 @@ public class EnumTest {
 
     @Test
     public void case13() {
+        String json = ONode.serialize(user, Feature.Write_EnumUsingToString);
+        System.out.println(json);
+
+        Assertions.assertEquals("{\"name\":\"Pack_xg\",\"age\":33,\"gender\":\"男\"}", json);
+    }
+
+    @Test
+    public void case14() {
         String json = ONode.serialize(user, Feature.Write_EnumShapeAsObject);
         System.out.println(json);
 
@@ -41,7 +48,7 @@ public class EnumTest {
     }
 
     @Test
-    public void case14() {
+    public void case15() {
         String json = ONode.serialize(user2);
         System.out.println(json);
 
@@ -139,6 +146,11 @@ public class EnumTest {
         }
 
         public String getName() {
+            return name;
+        }
+
+        @Override
+        public String toString() {
             return name;
         }
 
