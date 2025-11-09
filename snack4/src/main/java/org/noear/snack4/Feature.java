@@ -255,7 +255,7 @@ public enum Feature {
     Write_DoubleAsString,
 
     /**
-     * 写入大数时使用字符串模式
+     * 写入大数时使用 plain 模式
      */
     Write_BigDecimalAsPlain,
 
