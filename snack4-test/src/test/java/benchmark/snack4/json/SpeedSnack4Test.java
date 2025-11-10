@@ -78,7 +78,8 @@ public class SpeedSnack4Test {
 
         obj.put("list", list);
 
-        Options options = Options.of(Feature.Write_ClassName, Feature.Write_BrowserCompatible);
+        Options options = Options.of(Feature.Write_ClassName, Feature.Write_BrowserCompatible,
+                Feature.Read_AllowUseGetter, Feature.Write_AllowUseSetter);
 
         String tmp = ONode.ofBean(obj, options).toJson();
         System.out.println(tmp);
@@ -119,12 +120,15 @@ public class SpeedSnack4Test {
             group.ids[i] = i;
         }
 
-        String tmp = ONode.ofBean(group, Feature.Write_ClassName, Feature.Write_BrowserCompatible).toJson();
+        Options options = Options.of(Feature.Write_ClassName, Feature.Write_BrowserCompatible,
+                Feature.Read_AllowUseGetter, Feature.Write_AllowUseSetter);
+
+        String tmp = ONode.ofBean(group, options).toJson();
         System.out.println(tmp);
 
         long start = System.currentTimeMillis();
         for (int i = 0, len = 100000; i < len; i++) {
-            ONode.ofBean(group, Feature.Write_ClassName, Feature.Write_BrowserCompatible).toJson();
+            ONode.ofBean(group, options).toJson();
         }
         long times = System.currentTimeMillis() - start;
 
@@ -161,14 +165,18 @@ public class SpeedSnack4Test {
             group.ids[i] = i;
         }
 
-        String json = ONode.ofBean(group, Feature.Write_ClassName, Feature.Write_BrowserCompatible).toJson();
+        Options options = Options.of(Feature.Write_ClassName, Feature.Write_BrowserCompatible,
+                Feature.Read_AutoType,
+                Feature.Read_AllowUseGetter, Feature.Write_AllowUseSetter);
+
+        String json = ONode.ofBean(group, options).toJson();
         System.out.println(json);
 
-        ONode.ofJson(json, Feature.Read_AutoType).toBean(UserGroupModel.class);
+        ONode.ofJson(json, options).toBean(UserGroupModel.class);
 
         long start = System.currentTimeMillis();
         for (int i = 0, len = 100000; i < len; i++) {
-            ONode.ofJson(json, Feature.Read_AutoType).toBean(UserGroupModel.class);
+            ONode.ofJson(json, options).toBean(UserGroupModel.class);
         }
         long times = System.currentTimeMillis() - start;
 
@@ -204,14 +212,16 @@ public class SpeedSnack4Test {
             group.ids[i] = i;
         }
 
-        String json = ONode.ofBean(group).toJson();
+        Options options = Options.of();
+
+        String json = ONode.ofBean(group, options).toJson();
         System.out.println(json);
 
-        ONode.ofJson(json).toBean(Object.class);
+        ONode.ofJson(json, options).toBean(Object.class);
 
         long start = System.currentTimeMillis();
         for (int i = 0, len = 100000; i < len; i++) {
-            ONode.ofJson(json).toBean(Object.class);
+            ONode.ofJson(json, options).toBean(Object.class);
         }
         long times = System.currentTimeMillis() - start;
 
@@ -248,10 +258,13 @@ public class SpeedSnack4Test {
             group.ids[i] = i;
         }
 
-        String json = ONode.ofBean(group).toJson();
+
+        Options options = Options.of(Feature.Read_AllowUseGetter, Feature.Write_AllowUseSetter);
+
+        String json = ONode.ofBean(group, options).toJson();
         System.out.println(json);
 
-        ONode tmp = ONode.ofJson(json);
+        ONode tmp = ONode.ofJson(json, options);
 
         tmp.toBean(UserGroupModel.class);
 
@@ -331,16 +344,17 @@ public class SpeedSnack4Test {
 
         obj.put("list", list);
 
+        Options options = Options.of(Feature.Read_AllowUseGetter, Feature.Write_AllowUseSetter);
 
-        String json = ONode.ofBean(obj).toJson();
+        String json = ONode.ofBean(obj, options).toJson();
         System.out.println(json);
 
-        ONode.ofJson(json).toBean(obj.getClass());
+        ONode.ofJson(json, options).toBean(obj.getClass());
 
 
         long start = System.currentTimeMillis();
         for (int i = 0, len = 100000; i < len; i++) {
-            ONode.ofJson(json).toBean(obj.getClass());
+            ONode.ofJson(json, options).toBean(obj.getClass());
         }
         long times = System.currentTimeMillis() - start;
 
@@ -367,7 +381,6 @@ public class SpeedSnack4Test {
         list.add(m);
 
         obj.put("list", list);
-
 
         String json = ONode.ofBean(obj).toJson();
         System.out.println(json);
@@ -403,10 +416,11 @@ public class SpeedSnack4Test {
 
         obj.put("list", list);
 
+        Options options = Options.of(Feature.Read_AllowUseGetter, Feature.Write_AllowUseSetter);
 
-        String json = ONode.ofBean(obj).toJson();
+        String json = ONode.ofBean(obj, options).toJson();
         System.out.println(json);
-        ONode n = ONode.ofJson(json);
+        ONode n = ONode.ofJson(json, options);
 
         long start = System.currentTimeMillis();
         for (int i = 0, len = 100000; i < len; i++) {
