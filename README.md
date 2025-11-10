@@ -269,7 +269,7 @@ Supports `json schema` validation
 ```java
 JsonSchema schema = JsonSchema.ofJson("{type:'object',properties:{userId:{type:'string'}}}"); //加载架构定义
 
-schema.validate(ONode.load("{userId:'1'}")); //校验格式
+schema.validate(ONode.ofJson("{userId:'1'}")); //校验格式
 ```
 
 
