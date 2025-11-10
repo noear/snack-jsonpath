@@ -182,7 +182,7 @@ public class SpeedFastjsonTest {
 
     @Test
     public void test12() throws Exception {
-        //100000=>232,219,220 //551,478,467
+        //100000=>232,219,220 //551,478,467 //462,468,385
         //
         Map<String, Object> obj = new LinkedHashMap<String, Object>();
 
