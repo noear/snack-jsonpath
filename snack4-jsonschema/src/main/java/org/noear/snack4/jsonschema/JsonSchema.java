@@ -17,9 +17,7 @@ package org.noear.snack4.jsonschema;
 
 import org.noear.snack4.ONode;
 import org.noear.snack4.jsonschema.generate.JsonSchemaGenerator;
-import org.noear.snack4.jsonschema.rule.EnumRule;
-import org.noear.snack4.jsonschema.rule.TypeRule;
-import org.noear.snack4.jsonschema.rule.ValidationRule;
+import org.noear.snack4.jsonschema.rule.*;
 import org.noear.snack4.jsonschema.generate.SchemaUtil;
 
 import java.lang.reflect.Type;
@@ -84,97 +82,28 @@ public class JsonSchema {
             rule.validate(dataNode, path);
         }
 
-        // 处理类型校验
-        if (schemaNode.hasKey(SchemaUtil.NAME_TYPE)) {
-            validateType(schemaNode.get(SchemaUtil.NAME_TYPE), dataNode, path);
-        }
-
-        // 处理枚举校验
-        if (schemaNode.hasKey("enum")) {
-            validateEnum(schemaNode.get("enum"), dataNode, path);
-        }
 
         // 处理对象属性校验
         if (dataNode.isObject() && schemaNode.hasKey("properties")) {
             validateProperties(schemaNode.get("properties"), dataNode, path);
         }
 
-        // 处理数组校验
-        if (dataNode.isArray()) {
-            validateArrayConstraints(schemaNode, dataNode, path);
-        }
-
-        // 处理数值范围校验
-        if (dataNode.isNumber()) {
-            validateNumericConstraints(schemaNode, dataNode, path);
-        }
-
-        // 处理字符串格式校验
-        if (dataNode.isString()) {
-            validateStringConstraints(schemaNode, dataNode, path);
+        // 处理数组项校验
+        if (dataNode.isArray() && schemaNode.hasKey("items")) {
+            validateArrayItems(schemaNode.get("items"), dataNode, path);
         }
 
         // 处理条件校验
         validateConditional(schemaNode, dataNode, path);
     }
 
-    // 类型校验（完整实现）
-    private void validateType(ONode typeNode, ONode dataNode, PathTracker path) throws JsonSchemaException {
-        if (typeNode.isString()) {
-            String expectedType = typeNode.getString();
-            if (!matchType(dataNode, expectedType)) {
-                throw typeMismatch(expectedType, dataNode, path);
-            }
-        } else if (typeNode.isArray()) {
-            boolean matched = false;
-            for (ONode typeOption : typeNode.getArray()) {
-                if (matchType(dataNode, typeOption.getString())) {
-                    matched = true;
-                    break;
-                }
-            }
-            if (!matched) {
-                throw new JsonSchemaException("Type not in allowed types at " + path.currentPath());
-            }
+    private void validateArrayItems(ONode itemsSchema, ONode dataNode, PathTracker path) throws JsonSchemaException {
+        List<ONode> items = dataNode.getArray();
+        for (int i = 0; i < items.size(); i++) {
+            path.enterIndex(i);
+            validateNode(itemsSchema, items.get(i), path);
+            path.exit();
         }
-    }
-
-    private boolean matchType(ONode node, String type) {
-        switch (type) {
-            case "string":
-                return node.isString();
-            case "number":
-                return node.isNumber();
-            case "integer":
-                return node.isNumber() && isInteger(node.getNumber());
-            case "boolean":
-                return node.isBoolean();
-            case "object":
-                return node.isObject();
-            case "array":
-                return node.isArray();
-            case "null":
-                return node.isNull();
-            default:
-                return false;
-        }
-    }
-
-    private boolean isInteger(Number num) {
-        return num instanceof Integer || num instanceof Long ||
-                (num instanceof Double && num.doubleValue() == num.longValue());
-    }
-
-    // 枚举校验（完整实现）
-    private void validateEnum(ONode enumNode, ONode dataNode, PathTracker path) throws JsonSchemaException {
-        if (!enumNode.isArray()) return;
-
-        for (ONode allowedValue : enumNode.getArray()) {
-            if (deepEquals(allowedValue, dataNode)) {
-                return;
-            }
-        }
-        throw new JsonSchemaException("Value not in enum list at " + path.currentPath());
     }
 
     // 对象属性校验（完整实现）
@@ -203,75 +132,6 @@ public class JsonSchema {
                 validateNode(propEntry.getValue(), dataObj.get(propName), path);
             }
             path.exit();
-        }
-    }
-
-    // 数组约束校验（完整实现）
-    private void validateArrayConstraints(ONode schemaNode, ONode dataNode, PathTracker path) throws JsonSchemaException {
-        List<ONode> items = dataNode.getArray();
-
-        if (schemaNode.hasKey("minItems")) {
-            int min = schemaNode.get("minItems").getInt();
-            if (items.size() < min) {
-                throw new JsonSchemaException("Array length " + items.size() + " < minItems(" + min + ") at " + path.currentPath());
-            }
-        }
-        if (schemaNode.hasKey("maxItems")) {
-            int max = schemaNode.get("maxItems").getInt();
-            if (items.size() > max) {
-                throw new JsonSchemaException("Array length " + items.size() + " > maxItems(" + max + ") at " + path.currentPath());
-            }
-        }
-
-        if (schemaNode.hasKey("items")) {
-            ONode itemsSchema = schemaNode.get("items");
-            for (int i = 0; i < items.size(); i++) {
-                path.enterIndex(i);
-                validateNode(itemsSchema, items.get(i), path);
-                path.exit();
-            }
-        }
-    }
-
-    // 数值范围校验（完整实现）
-    private void validateNumericConstraints(ONode schemaNode, ONode dataNode, PathTracker path) throws JsonSchemaException {
-        double value = dataNode.getDouble();
-
-        if (schemaNode.hasKey("minimum")) {
-            double min = schemaNode.get("minimum").getDouble();
-            if (value < min) {
-                throw new JsonSchemaException("Value " + value + " < minimum(" + min + ") at " + path.currentPath());
-            }
-        }
-        if (schemaNode.hasKey("maximum")) {
-            double max = schemaNode.get("maximum").getDouble();
-            if (value > max) {
-                throw new JsonSchemaException("Value " + value + " > maximum(" + max + ") at " + path.currentPath());
-            }
-        }
-    }
-
-    // 字符串约束校验（完整实现）
-    private void validateStringConstraints(ONode schemaNode, ONode dataNode, PathTracker path) throws JsonSchemaException {
-        String value = dataNode.getString();
-
-        if (schemaNode.hasKey("minLength")) {
-            int min = schemaNode.get("minLength").getInt();
-            if (value.length() < min) {
-                throw new JsonSchemaException("String length " + value.length() + " < minLength(" + min + ") at " + path.currentPath());
-            }
-        }
-        if (schemaNode.hasKey("maxLength")) {
-            int max = schemaNode.get("maxLength").getInt();
-            if (value.length() > max) {
-                throw new JsonSchemaException("String length " + value.length() + " > maxLength(" + max + ") at " + path.currentPath());
-            }
-        }
-        if (schemaNode.hasKey("pattern")) {
-            String pattern = schemaNode.get("pattern").getString();
-            if (!value.matches(pattern)) {
-                throw new JsonSchemaException("String does not match pattern: " + pattern + " at " + path.currentPath());
-            }
         }
     }
 
@@ -312,48 +172,6 @@ public class JsonSchema {
         }
     }
 
-    // 深度比较方法（完整实现）
-    private boolean deepEquals(ONode a, ONode b) {
-        if (a.type() != b.type()) return false;
-
-        switch (a.type()) {
-            case Null:
-                return true;
-            case Boolean:
-                return a.getBoolean() == b.getBoolean();
-            case Number:
-                return a.getNumber().doubleValue() == b.getNumber().doubleValue();
-            case String:
-                return a.getString().equals(b.getString());
-            case Array:
-                List<ONode> aArr = a.getArray();
-                List<ONode> bArr = b.getArray();
-                if (aArr.size() != bArr.size()) return false;
-                for (int i = 0; i < aArr.size(); i++) {
-                    if (!deepEquals(aArr.get(i), bArr.get(i))) return false;
-                }
-                return true;
-            case Object:
-                Map<String, ONode> aObj = a.getObject();
-                Map<String, ONode> bObj = b.getObject();
-                if (aObj.size() != bObj.size()) return false;
-                for (Map.Entry<String, ONode> entry : aObj.entrySet()) {
-                    String key = entry.getKey();
-                    if (!bObj.containsKey(key)) return false;
-                    if (!deepEquals(entry.getValue(), bObj.get(key))) return false;
-                }
-                return true;
-            default:
-                return false;
-        }
-    }
-
-    // 异常处理
-    private JsonSchemaException typeMismatch(String expected, ONode actual, PathTracker path) {
-        return new JsonSchemaException("Expected type " + expected + " but got " +
-                SchemaUtil.getSchemaTypeName(actual) + " at " + path.currentPath());
-    }
-
     // 预编译相关实现
     private Map<String, CompiledRule> compileSchema(ONode schema) {
         Map<String, CompiledRule> rules = new HashMap<>();
@@ -364,18 +182,36 @@ public class JsonSchema {
     private void compileSchemaRecursive(ONode schemaNode, Map<String, CompiledRule> rules, PathTracker path) {
         List<ValidationRule> localRules = new ArrayList<>();
 
+        // 类型规则
         if (schemaNode.hasKey(SchemaUtil.NAME_TYPE)) {
             localRules.add(new TypeRule(schemaNode.get(SchemaUtil.NAME_TYPE)));
         }
 
+        // 枚举规则
         if (schemaNode.hasKey("enum")) {
             localRules.add(new EnumRule(schemaNode.get("enum")));
+        }
+
+        // 字符串约束规则
+        if (schemaNode.hasKey("minLength") || schemaNode.hasKey("maxLength") || schemaNode.hasKey("pattern")) {
+            localRules.add(new StringConstraintRule(schemaNode));
+        }
+
+        // 数值约束规则
+        if (schemaNode.hasKey("minimum") || schemaNode.hasKey("maximum")) {
+            localRules.add(new NumericConstraintRule(schemaNode));
+        }
+
+        // 数组约束规则
+        if (schemaNode.hasKey("minItems") || schemaNode.hasKey("maxItems")) {
+            localRules.add(new ArrayConstraintRule(schemaNode));
         }
 
         if (!localRules.isEmpty()) {
             rules.put(path.currentPath(), new CompiledRule(localRules));
         }
 
+        // 递归处理对象属性
         if (schemaNode.hasKey("properties")) {
             ONode propsNode = schemaNode.get("properties");
             for (Map.Entry<String, ONode> kv : propsNode.getObject().entrySet()) {
@@ -385,6 +221,7 @@ public class JsonSchema {
             }
         }
 
+        // 递归处理数组项
         if (schemaNode.hasKey("items")) {
             path.enterIndex(0);
             compileSchemaRecursive(schemaNode.get("items"), rules, path);
