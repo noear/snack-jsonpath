@@ -38,20 +38,34 @@ import java.util.*;
  * @since 4.0
  */
 public class JsonSchemaGenerator {
-    static final List<TypePatternGenerator> typePatternEncoders = new ArrayList<>();
-    static final Map<Class<?>, TypeGenerator> typeEncoders = new HashMap<>();
+    static final List<TypePatternGenerator> TYPE_PATTERN_GENERATORS = new ArrayList<>();
+    static final Map<Class<?>, TypeGenerator> TYPE_GENERATOR_MAP = new HashMap<>();
 
     static {
-        typePatternEncoders.add(new _DatePatternGenerator());
-        typePatternEncoders.add(new _EnumPatternGenerator());
-        typePatternEncoders.add(new _NumberPatternGenerator());
+        TYPE_PATTERN_GENERATORS.add(new _DatePatternGenerator());
+        TYPE_PATTERN_GENERATORS.add(new _EnumPatternGenerator());
+        TYPE_PATTERN_GENERATORS.add(new _NumberPatternGenerator());
 
-        typeEncoders.put(Boolean.class, BooleanGenerator.getInstance());
-        typeEncoders.put(boolean.class, BooleanGenerator.getInstance());
-        typeEncoders.put(char.class, new CharGenerator());
+        TYPE_GENERATOR_MAP.put(Boolean.class, BooleanGenerator.getInstance());
+        TYPE_GENERATOR_MAP.put(boolean.class, BooleanGenerator.getInstance());
+        TYPE_GENERATOR_MAP.put(char.class, new CharGenerator());
 
-        typeEncoders.put(String.class, new StringGenerator());
-        typeEncoders.put(URI.class, new URIGenerator());
+        TYPE_GENERATOR_MAP.put(String.class, new StringGenerator());
+        TYPE_GENERATOR_MAP.put(URI.class, new URIGenerator());
+    }
+
+    private static TypeGenerator getGenerator(TypeEggg typeEggg) {
+        TypeGenerator tmp = TYPE_GENERATOR_MAP.get(typeEggg.getType());
+
+        if (tmp == null) {
+            for (TypePatternGenerator b1 : TYPE_PATTERN_GENERATORS) {
+                if (b1.canEncode(typeEggg)) {
+                    return b1;
+                }
+            }
+        }
+
+        return tmp;
     }
 
     /**
@@ -96,24 +110,10 @@ public class JsonSchemaGenerator {
         }
     }
 
-    private TypeGenerator getEncoder(TypeEggg typeEggg) {
-        TypeGenerator tmp = typeEncoders.get(typeEggg.getType());
-
-        if (tmp == null) {
-            for (TypePatternGenerator b1 : typePatternEncoders) {
-                if (b1.canEncode(typeEggg)) {
-                    return b1;
-                }
-            }
-        }
-
-        return tmp;
-    }
-
     // 值转ONode处理
     private ONode encodeValueToNode(TypeEggg typeEggg, ONodeAttrHolder attr) throws Throwable {
         // 优先使用自定义编解码器
-        TypeGenerator codec = getEncoder(typeEggg);
+        TypeGenerator codec = getGenerator(typeEggg);
         if (codec != null) {
             return codec.encode(attr, typeEggg, new ONode());
         }

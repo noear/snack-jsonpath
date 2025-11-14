@@ -35,6 +35,7 @@ public class _EnumPatternGenerator implements TypePatternGenerator {
     @Override
     public ONode encode(ONodeAttrHolder att, TypeEggg typeEggg, ONode target) {
         target.set("type", SchemaUtil.TYPE_STRING);
+
         target.getOrNew("enum").then(n -> {
             for (Object e : typeEggg.getType().getEnumConstants()) {
                 n.add(e.toString());

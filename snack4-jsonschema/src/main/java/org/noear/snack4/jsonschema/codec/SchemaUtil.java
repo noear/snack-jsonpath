@@ -34,6 +34,8 @@ public class SchemaUtil {
     public static final String NAME_PROPERTIES = "properties";
     public static final String NAME_DESCRIPTION = "description";
     public static final String NAME_REQUIRED = "required";
+    public static final String NAME_ITEMS = "items";
+    public static final String NAME_ENUM = "enum";
 
     public static final String TYPE_OBJECT = "object";
     public static final String TYPE_ARRAY = "array";
@@ -42,7 +44,6 @@ public class SchemaUtil {
     public static final String TYPE_INTEGER = "integer";
     public static final String TYPE_BOOLEAN = "boolean";
     public static final String TYPE_NULL = "null";
-
 
     public static String getSchemaTypeName(ONode node) {
         switch (node.type()) {
