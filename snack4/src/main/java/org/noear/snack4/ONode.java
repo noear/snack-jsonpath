@@ -21,7 +21,6 @@ import org.noear.snack4.codec.TypeRef;
 import org.noear.snack4.codec.util.DateUtil;
 import org.noear.snack4.json.JsonReader;
 import org.noear.snack4.json.JsonWriter;
-import org.noear.snack4.json.util.FormatUtil;
 import org.noear.snack4.jsonpath.JsonPathProvider;
 import org.noear.snack4.jsonpath.PathSource;
 import org.noear.snack4.util.Asserts;
@@ -113,6 +112,10 @@ public final class ONode {
 
     public boolean isString() {
         return type == DataType.String;
+    }
+
+    public boolean isNotEmptyString() {
+        return type == DataType.String && Asserts.isNotEmpty(this.<String>getValueAs());
     }
 
     public boolean isDate() {

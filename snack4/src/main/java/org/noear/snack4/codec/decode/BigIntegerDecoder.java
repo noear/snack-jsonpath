@@ -35,6 +35,10 @@ public class BigIntegerDecoder implements ObjectDecoder<BigInteger> {
             }
         }
 
-        return new BigInteger(node.getString());
+        if (node.isNotEmptyString()) {
+            return new BigInteger(node.getString());
+        } else {
+            return null;
+        }
     }
 }

@@ -35,6 +35,10 @@ public class BigDecimalDecoder implements ObjectDecoder<BigDecimal> {
             }
         }
 
-        return new BigDecimal(node.getString());
+        if (node.isNotEmptyString()) {
+            return new BigDecimal(node.getString());
+        } else {
+            return null;
+        }
     }
 }
