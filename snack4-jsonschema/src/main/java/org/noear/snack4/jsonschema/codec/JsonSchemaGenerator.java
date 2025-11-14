@@ -21,15 +21,13 @@ import org.noear.eggg.PropertyEggg;
 import org.noear.eggg.TypeEggg;
 import org.noear.snack4.ONode;
 import org.noear.snack4.annotation.ONodeAttrHolder;
-import org.noear.snack4.codec.CodecException;
 import org.noear.snack4.codec.util.EgggUtil;
+import org.noear.snack4.jsonschema.JsonSchema;
 import org.noear.snack4.jsonschema.JsonSchemaException;
-import org.noear.snack4.jsonschema.codec.encode.*;
+import org.noear.snack4.jsonschema.codec.generate.*;
 import org.noear.snack4.util.Asserts;
 
 import java.lang.reflect.Type;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.net.URI;
 import java.util.*;
 
@@ -39,35 +37,36 @@ import java.util.*;
  * @author noear 2025/11/14 created
  * @since 4.0
  */
-public class JsonSchemaBuilder {
-    static final List<TypePatternSchemaBuilder> typePatternEncoders = new  ArrayList<>();
-    static final Map<Class<?>, TypeSchemaBuilder> typeEncoders = new  HashMap<>();
+public class JsonSchemaGenerator {
+    static final List<TypePatternGenerator> typePatternEncoders = new ArrayList<>();
+    static final Map<Class<?>, TypeGenerator> typeEncoders = new HashMap<>();
+
     static {
-        typePatternEncoders.add(new _DatePatternSchemaBuilder());
-        typePatternEncoders.add(new _EnumPatternSchemaBuilder());
-        typePatternEncoders.add(new _NumberPatternSchemaBuilder());
+        typePatternEncoders.add(new _DatePatternGenerator());
+        typePatternEncoders.add(new _EnumPatternGenerator());
+        typePatternEncoders.add(new _NumberPatternGenerator());
 
-        typeEncoders.put(Boolean.class,  BooleanSchemaBuilder.getInstance());
-        typeEncoders.put(boolean.class, BooleanSchemaBuilder.getInstance());
-        typeEncoders.put(char.class,  new CharSchemaBuilder());
+        typeEncoders.put(Boolean.class, BooleanGenerator.getInstance());
+        typeEncoders.put(boolean.class, BooleanGenerator.getInstance());
+        typeEncoders.put(char.class, new CharGenerator());
 
-        typeEncoders.put(String.class, new StringSchemaBuilder());
-        typeEncoders.put(URI.class, new URISchemaBuilder());
+        typeEncoders.put(String.class, new StringGenerator());
+        typeEncoders.put(URI.class, new URIGenerator());
     }
 
     /**
      * Java Object 编码为 ONode
      */
-    public static ONode encode(Type type) {
+    public static JsonSchema generate(Type type) {
         if (type == null) {
-            return new ONode(null);
+            return null;
         }
 
-        if(type == void.class){
+        if (type == void.class) {
             throw new JsonSchemaException("Not support the void type");
         }
 
-        return new JsonSchemaBuilder(EgggUtil.getTypeEggg(type)).encode();
+        return new JsonSchemaGenerator(EgggUtil.getTypeEggg(type)).generate();
     }
 
     private final TypeEggg source0;
@@ -75,7 +74,7 @@ public class JsonSchemaBuilder {
     private final Map<Object, Object> visited;
 
 
-    private JsonSchemaBuilder(TypeEggg typeEggg) {
+    private JsonSchemaGenerator(TypeEggg typeEggg) {
         this.source0 = typeEggg;
         this.visited = new IdentityHashMap<>();
     }
@@ -83,23 +82,26 @@ public class JsonSchemaBuilder {
     /**
      * Java Object 编码为 ONode
      */
-    public ONode encode() {
+    public JsonSchema generate() {
         try {
-            return encodeValueToNode(source0, null);
+            ONode oNode = encodeValueToNode(source0, null);
+
+            return new JsonSchema(oNode);
         } catch (Throwable e) {
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;
             }
-            throw new CodecException("Failed to encode bean to ONode", e);
+
+            throw new JsonSchemaException("Failed to encode bean to ONode", e);
         }
     }
 
-    private TypeSchemaBuilder getEncoder(TypeEggg typeEggg) {
-        TypeSchemaBuilder tmp = typeEncoders.get(typeEggg.getType());
+    private TypeGenerator getEncoder(TypeEggg typeEggg) {
+        TypeGenerator tmp = typeEncoders.get(typeEggg.getType());
 
         if (tmp == null) {
-            for (TypePatternSchemaBuilder b1 : typePatternEncoders) {
-                if(b1.canEncode(typeEggg)){
+            for (TypePatternGenerator b1 : typePatternEncoders) {
+                if (b1.canEncode(typeEggg)) {
                     return b1;
                 }
             }
@@ -111,7 +113,7 @@ public class JsonSchemaBuilder {
     // 值转ONode处理
     private ONode encodeValueToNode(TypeEggg typeEggg, ONodeAttrHolder attr) throws Throwable {
         // 优先使用自定义编解码器
-        TypeSchemaBuilder codec = getEncoder(typeEggg);
+        TypeGenerator codec = getEncoder(typeEggg);
         if (codec != null) {
             return codec.encode(attr, typeEggg, new ONode());
         }
@@ -168,7 +170,7 @@ public class JsonSchemaBuilder {
 
                 if (propertyNode != null) {
 
-                    if(Asserts.isNotEmpty(attr.getDescription())){
+                    if (Asserts.isNotEmpty(attr.getDescription())) {
                         propertyNode.set(SchemaUtil.NAME_DESCRIPTION, attr.getDescription());
                     }
 

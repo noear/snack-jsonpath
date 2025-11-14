@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.noear.snack4.jsonschema.codec.encode;
+package org.noear.snack4.jsonschema.codec.generate;
 
 import org.noear.eggg.TypeEggg;
 import org.noear.snack4.ONode;
 import org.noear.snack4.annotation.ONodeAttrHolder;
 import org.noear.snack4.jsonschema.codec.SchemaUtil;
-import org.noear.snack4.jsonschema.codec.TypePatternSchemaBuilder;
+import org.noear.snack4.jsonschema.codec.TypePatternGenerator;
 
 import java.util.Date;
 
@@ -28,7 +28,7 @@ import java.util.Date;
  * @author noear 2025/10/3 created
  * @since 4.0
  */
-public class _DatePatternSchemaBuilder implements TypePatternSchemaBuilder {
+public class _DatePatternGenerator implements TypePatternGenerator {
     @Override
     public boolean canEncode(TypeEggg typeEggg) {
         return Date.class.isAssignableFrom(typeEggg.getType());

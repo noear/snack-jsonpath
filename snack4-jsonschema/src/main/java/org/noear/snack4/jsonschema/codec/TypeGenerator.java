@@ -9,6 +9,6 @@ import org.noear.snack4.annotation.ONodeAttrHolder;
  * @author noear 2025/11/14 created
  *
  */
-public interface TypeSchemaBuilder {
+public interface TypeGenerator {
     ONode encode(ONodeAttrHolder att, TypeEggg typeEggg, ONode target);
 }

@@ -1,10 +1,10 @@
-package org.noear.snack4.jsonschema.codec.encode;
+package org.noear.snack4.jsonschema.codec.generate;
 
 import org.noear.eggg.TypeEggg;
 import org.noear.snack4.ONode;
 import org.noear.snack4.annotation.ONodeAttrHolder;
 import org.noear.snack4.jsonschema.codec.SchemaUtil;
-import org.noear.snack4.jsonschema.codec.TypePatternSchemaBuilder;
+import org.noear.snack4.jsonschema.codec.TypePatternGenerator;
 
 import java.math.BigInteger;
 
@@ -13,7 +13,7 @@ import java.math.BigInteger;
  * @author noear 2025/11/14 created
  *
  */
-public class _NumberPatternSchemaBuilder implements TypePatternSchemaBuilder {
+public class _NumberPatternGenerator implements TypePatternGenerator {
     @Override
     public boolean canEncode(TypeEggg typeEggg) {
         return typeEggg.isNumber();

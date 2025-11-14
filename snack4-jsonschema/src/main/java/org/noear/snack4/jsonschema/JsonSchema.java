@@ -16,7 +16,7 @@
 package org.noear.snack4.jsonschema;
 
 import org.noear.snack4.ONode;
-import org.noear.snack4.jsonschema.codec.JsonSchemaBuilder;
+import org.noear.snack4.jsonschema.codec.JsonSchemaGenerator;
 import org.noear.snack4.jsonschema.rule.EnumRule;
 import org.noear.snack4.jsonschema.rule.TypeRule;
 import org.noear.snack4.jsonschema.rule.ValidationRule;
@@ -43,7 +43,7 @@ public class JsonSchema {
     public static JsonSchema ofType(Type type) {
         Objects.requireNonNull(type, "type");
 
-        return new JsonSchema(JsonSchemaBuilder.encode(type));
+        return JsonSchemaGenerator.generate(type);
     }
 
     private final ONode schema;

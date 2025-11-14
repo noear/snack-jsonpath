@@ -1,19 +1,19 @@
-package org.noear.snack4.jsonschema.codec.encode;
+package org.noear.snack4.jsonschema.codec.generate;
 
 import org.noear.eggg.TypeEggg;
 import org.noear.snack4.ONode;
 import org.noear.snack4.annotation.ONodeAttrHolder;
 import org.noear.snack4.jsonschema.codec.SchemaUtil;
-import org.noear.snack4.jsonschema.codec.TypeSchemaBuilder;
+import org.noear.snack4.jsonschema.codec.TypeGenerator;
 
 /**
  *
  * @author noear 2025/11/14 created
  *
  */
-public class BooleanSchemaBuilder implements TypeSchemaBuilder {
-    private static final BooleanSchemaBuilder _instance = new BooleanSchemaBuilder();
-    public static BooleanSchemaBuilder getInstance() {
+public class BooleanGenerator implements TypeGenerator {
+    private static final BooleanGenerator _instance = new BooleanGenerator();
+    public static BooleanGenerator getInstance() {
         return _instance;
     }
 

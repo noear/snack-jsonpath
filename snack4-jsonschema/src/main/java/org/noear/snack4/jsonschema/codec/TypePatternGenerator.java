@@ -7,7 +7,7 @@ import org.noear.eggg.TypeEggg;
  * @author noear 2025/11/14 created
  *
  */
-public interface TypePatternSchemaBuilder extends TypeSchemaBuilder {
+public interface TypePatternGenerator extends TypeGenerator {
     /**
      * 可以编码的
      */
