@@ -27,6 +27,13 @@ import org.noear.snack4.jsonschema.codec.TypeGenerator;
  *
  */
 public class CharGenerator implements TypeGenerator {
+    private static final CharGenerator instance = new CharGenerator();
+
+    public static CharGenerator getInstance() {
+        return instance;
+    }
+
+
     @Override
     public ONode generate(ONodeAttrHolder att, TypeEggg typeEggg, ONode target) {
         return target.set("type", SchemaUtil.TYPE_STRING)

@@ -27,9 +27,9 @@ import org.noear.snack4.jsonschema.codec.TypeGenerator;
  *
  */
 public class BooleanGenerator implements TypeGenerator {
-    private static final BooleanGenerator _instance = new BooleanGenerator();
+    private static final BooleanGenerator instance = new BooleanGenerator();
     public static BooleanGenerator getInstance() {
-        return _instance;
+        return instance;
     }
 
     @Override

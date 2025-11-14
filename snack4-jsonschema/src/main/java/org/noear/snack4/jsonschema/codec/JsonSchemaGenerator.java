@@ -20,16 +20,17 @@ import org.noear.eggg.Property;
 import org.noear.eggg.PropertyEggg;
 import org.noear.eggg.TypeEggg;
 import org.noear.snack4.ONode;
-import org.noear.snack4.annotation.ONodeAttr;
 import org.noear.snack4.annotation.ONodeAttrHolder;
 import org.noear.snack4.codec.util.EgggUtil;
-import org.noear.snack4.jsonschema.JsonSchema;
 import org.noear.snack4.jsonschema.JsonSchemaException;
 import org.noear.snack4.jsonschema.codec.generate.*;
 import org.noear.snack4.util.Asserts;
 
 import java.lang.reflect.Type;
 import java.net.URI;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 
 /**
@@ -49,10 +50,15 @@ public class JsonSchemaGenerator {
 
         TYPE_GENERATOR_MAP.put(Boolean.class, BooleanGenerator.getInstance());
         TYPE_GENERATOR_MAP.put(boolean.class, BooleanGenerator.getInstance());
-        TYPE_GENERATOR_MAP.put(char.class, new CharGenerator());
+        TYPE_GENERATOR_MAP.put(Character.class, CharGenerator.getInstance());
+        TYPE_GENERATOR_MAP.put(char.class, CharGenerator.getInstance());
 
         TYPE_GENERATOR_MAP.put(String.class, new StringGenerator());
         TYPE_GENERATOR_MAP.put(URI.class, new URIGenerator());
+
+        TYPE_GENERATOR_MAP.put(LocalDate.class, new LocalDateGenerator());
+        TYPE_GENERATOR_MAP.put(LocalTime.class, new LocalTimeGenerator());
+        TYPE_GENERATOR_MAP.put(LocalDateTime.class, new LocalDateTimeGenerator());
     }
 
     private static TypeGenerator getGenerator(TypeEggg typeEggg) {
@@ -99,7 +105,7 @@ public class JsonSchemaGenerator {
      */
     public ONode generate() {
         try {
-            return encodeValueToNode(source0, null);
+            return generateValueToNode(source0, null);
         } catch (Throwable e) {
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;
@@ -110,7 +116,7 @@ public class JsonSchemaGenerator {
     }
 
     // 值转ONode处理
-    private ONode encodeValueToNode(TypeEggg typeEggg, ONodeAttrHolder attr) throws Throwable {
+    private ONode generateValueToNode(TypeEggg typeEggg, ONodeAttrHolder attr) throws Throwable {
         // 优先使用自定义编解码器
         TypeGenerator codec = getGenerator(typeEggg);
         if (codec != null) {
@@ -118,20 +124,20 @@ public class JsonSchemaGenerator {
         }
 
         if (typeEggg.isCollection()) {
-            return encodeCollectionToNode(typeEggg);
+            return generateCollectionToNode(typeEggg);
         } else if (typeEggg.isMap()) {
-            return encodeMapToNode(typeEggg);
+            return generateMapToNode(typeEggg);
         } else {
             if (typeEggg.isArray()) {
-                return encodeArrayToNode(typeEggg);
+                return generateArrayToNode(typeEggg);
             } else {
-                return encodeBeanToNode(typeEggg);
+                return generateBeanToNode(typeEggg);
             }
         }
     }
 
     // 对象转ONode核心逻辑
-    private ONode encodeBeanToNode(TypeEggg typeEggg) throws Throwable {
+    private ONode generateBeanToNode(TypeEggg typeEggg) throws Throwable {
         // 循环引用检测
         if (visited.containsKey(typeEggg)) {
             return null;
@@ -165,7 +171,7 @@ public class JsonSchemaGenerator {
                     continue;
                 }
 
-                ONode propertyNode = encodeValueToNode(property.getTypeEggg(), attr);
+                ONode propertyNode = generateValueToNode(property.getTypeEggg(), attr);
 
                 if (propertyNode != null) {
 
@@ -198,23 +204,23 @@ public class JsonSchemaGenerator {
     }
 
     // 处理数组类型
-    private ONode encodeArrayToNode(TypeEggg typeEggg) throws Throwable {
+    private ONode generateArrayToNode(TypeEggg typeEggg) throws Throwable {
         ONode tmp = new ONode();
         tmp.set("type", SchemaUtil.TYPE_ARRAY);
 
-        ONode itemsType = encodeValueToNode(EgggUtil.getTypeEggg(typeEggg.getType().getComponentType()), null);
+        ONode itemsType = generateValueToNode(EgggUtil.getTypeEggg(typeEggg.getType().getComponentType()), null);
         tmp.set("items", itemsType);
 
         return tmp;
     }
 
     // 处理集合类型
-    private ONode encodeCollectionToNode(TypeEggg typeEggg) throws Throwable {
+    private ONode generateCollectionToNode(TypeEggg typeEggg) throws Throwable {
         ONode tmp = new ONode();
         tmp.set("type", SchemaUtil.TYPE_ARRAY);
 
         if (typeEggg.isParameterizedType()) {
-            ONode itemsType = encodeValueToNode(EgggUtil.getTypeEggg(typeEggg.getActualTypeArguments()[0]), null);
+            ONode itemsType = generateValueToNode(EgggUtil.getTypeEggg(typeEggg.getActualTypeArguments()[0]), null);
             tmp.set("items", itemsType);
         }
 
@@ -222,7 +228,7 @@ public class JsonSchemaGenerator {
     }
 
     // 处理Map类型
-    private ONode encodeMapToNode(TypeEggg typeEggg) throws Throwable {
+    private ONode generateMapToNode(TypeEggg typeEggg) throws Throwable {
         ONode tmp = new ONode();
         tmp.set("type", SchemaUtil.TYPE_OBJECT);
         return tmp;
