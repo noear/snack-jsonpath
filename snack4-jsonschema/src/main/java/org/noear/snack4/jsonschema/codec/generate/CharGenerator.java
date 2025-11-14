@@ -28,7 +28,7 @@ import org.noear.snack4.jsonschema.codec.TypeGenerator;
  */
 public class CharGenerator implements TypeGenerator {
     @Override
-    public ONode encode(ONodeAttrHolder att, TypeEggg typeEggg, ONode target) {
+    public ONode generate(ONodeAttrHolder att, TypeEggg typeEggg, ONode target) {
         return target.set("type", SchemaUtil.TYPE_STRING)
                 .set("maxLength", 1)
                 .set("minLength", 1);

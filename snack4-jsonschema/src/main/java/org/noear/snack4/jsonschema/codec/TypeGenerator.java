@@ -25,5 +25,5 @@ import org.noear.snack4.annotation.ONodeAttrHolder;
  * @since 4.0
  */
 public interface TypeGenerator<T> {
-    ONode encode(ONodeAttrHolder att, TypeEggg typeEggg, ONode target);
+    ONode generate(ONodeAttrHolder att, TypeEggg typeEggg, ONode target);
 }

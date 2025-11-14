@@ -33,7 +33,7 @@ public class BooleanGenerator implements TypeGenerator {
     }
 
     @Override
-    public ONode encode(ONodeAttrHolder att, TypeEggg typeEggg, ONode target) {
+    public ONode generate(ONodeAttrHolder att, TypeEggg typeEggg, ONode target) {
         return target.set("type", SchemaUtil.TYPE_BOOLEAN);
     }
 }

@@ -43,7 +43,13 @@ public class JsonSchema {
     public static JsonSchema ofType(Type type) {
         Objects.requireNonNull(type, "type");
 
-        return JsonSchemaGenerator.generate(type);
+        ONode oNode = JsonSchemaGenerator.generate(type);
+
+        if (oNode == null) {
+            throw new JsonSchemaException("The type jsonSchema generation failed: " + type.toString());
+        }
+
+        return new JsonSchema(oNode);
     }
 
     private final ONode schema;
@@ -62,7 +68,7 @@ public class JsonSchema {
         return String.valueOf(compiledRules);
     }
 
-    public String toJson(){
+    public String toJson() {
         return schema.toJson();
     }
 
@@ -135,14 +141,22 @@ public class JsonSchema {
 
     private boolean matchType(ONode node, String type) {
         switch (type) {
-            case "string": return node.isString();
-            case "number": return node.isNumber();
-            case "integer": return node.isNumber() && isInteger(node.getNumber());
-            case "boolean": return node.isBoolean();
-            case "object": return node.isObject();
-            case "array": return node.isArray();
-            case "null": return node.isNull();
-            default: return false;
+            case "string":
+                return node.isString();
+            case "number":
+                return node.isNumber();
+            case "integer":
+                return node.isNumber() && isInteger(node.getNumber());
+            case "boolean":
+                return node.isBoolean();
+            case "object":
+                return node.isObject();
+            case "array":
+                return node.isArray();
+            case "null":
+                return node.isNull();
+            default:
+                return false;
         }
     }
 
@@ -303,8 +317,10 @@ public class JsonSchema {
         if (a.type() != b.type()) return false;
 
         switch (a.type()) {
-            case Null: return true;
-            case Boolean: return a.getBoolean() == b.getBoolean();
+            case Null:
+                return true;
+            case Boolean:
+                return a.getBoolean() == b.getBoolean();
             case Number:
                 return a.getNumber().doubleValue() == b.getNumber().doubleValue();
             case String:
@@ -327,7 +343,8 @@ public class JsonSchema {
                     if (!deepEquals(entry.getValue(), bObj.get(key))) return false;
                 }
                 return true;
-            default: return false;
+            default:
+                return false;
         }
     }
 

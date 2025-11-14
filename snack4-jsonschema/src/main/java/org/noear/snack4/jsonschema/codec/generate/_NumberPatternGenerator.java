@@ -30,12 +30,12 @@ import java.math.BigInteger;
  */
 public class _NumberPatternGenerator implements TypePatternGenerator {
     @Override
-    public boolean canEncode(TypeEggg typeEggg) {
+    public boolean canGenerate(TypeEggg typeEggg) {
         return typeEggg.isNumber();
     }
 
     @Override
-    public ONode encode(ONodeAttrHolder att, TypeEggg typeEggg, ONode target) {
+    public ONode generate(ONodeAttrHolder att, TypeEggg typeEggg, ONode target) {
         Class<?> type = typeEggg.getType();
 
         if (type.equals(Byte.class) || type.equals(byte.class) ||

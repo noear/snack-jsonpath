@@ -28,12 +28,12 @@ import org.noear.snack4.jsonschema.codec.TypePatternGenerator;
  */
 public class _EnumPatternGenerator implements TypePatternGenerator {
     @Override
-    public boolean canEncode(TypeEggg typeEggg) {
+    public boolean canGenerate(TypeEggg typeEggg) {
         return typeEggg.isEnum();
     }
 
     @Override
-    public ONode encode(ONodeAttrHolder att, TypeEggg typeEggg, ONode target) {
+    public ONode generate(ONodeAttrHolder att, TypeEggg typeEggg, ONode target) {
         target.set("type", SchemaUtil.TYPE_STRING);
 
         target.getOrNew("enum").then(n -> {

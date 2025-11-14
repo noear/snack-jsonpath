@@ -20,6 +20,7 @@ import org.noear.eggg.Property;
 import org.noear.eggg.PropertyEggg;
 import org.noear.eggg.TypeEggg;
 import org.noear.snack4.ONode;
+import org.noear.snack4.annotation.ONodeAttr;
 import org.noear.snack4.annotation.ONodeAttrHolder;
 import org.noear.snack4.codec.util.EgggUtil;
 import org.noear.snack4.jsonschema.JsonSchema;
@@ -59,7 +60,7 @@ public class JsonSchemaGenerator {
 
         if (tmp == null) {
             for (TypePatternGenerator b1 : TYPE_PATTERN_GENERATORS) {
-                if (b1.canEncode(typeEggg)) {
+                if (b1.canGenerate(typeEggg)) {
                     return b1;
                 }
             }
@@ -71,7 +72,7 @@ public class JsonSchemaGenerator {
     /**
      * Java Object 编码为 ONode
      */
-    public static JsonSchema generate(Type type) {
+    public static ONode generate(Type type) {
         if (type == null) {
             return null;
         }
@@ -96,11 +97,9 @@ public class JsonSchemaGenerator {
     /**
      * Java Object 编码为 ONode
      */
-    public JsonSchema generate() {
+    public ONode generate() {
         try {
-            ONode oNode = encodeValueToNode(source0, null);
-
-            return new JsonSchema(oNode);
+            return encodeValueToNode(source0, null);
         } catch (Throwable e) {
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;
@@ -115,7 +114,7 @@ public class JsonSchemaGenerator {
         // 优先使用自定义编解码器
         TypeGenerator codec = getGenerator(typeEggg);
         if (codec != null) {
-            return codec.encode(attr, typeEggg, new ONode());
+            return codec.generate(attr, typeEggg, new ONode());
         }
 
         if (typeEggg.isCollection()) {

@@ -30,12 +30,12 @@ import java.util.Date;
  */
 public class _DatePatternGenerator implements TypePatternGenerator {
     @Override
-    public boolean canEncode(TypeEggg typeEggg) {
+    public boolean canGenerate(TypeEggg typeEggg) {
         return Date.class.isAssignableFrom(typeEggg.getType());
     }
 
     @Override
-    public ONode encode(ONodeAttrHolder att, TypeEggg typeEggg, ONode target) {
+    public ONode generate(ONodeAttrHolder att, TypeEggg typeEggg, ONode target) {
         return target.set("type", SchemaUtil.TYPE_STRING)
                 .set("format", "date-time");
     }

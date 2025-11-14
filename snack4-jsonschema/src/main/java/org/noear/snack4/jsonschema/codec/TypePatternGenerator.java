@@ -26,5 +26,5 @@ public interface TypePatternGenerator<T> extends TypeGenerator<T> {
     /**
      * 可以编码的
      */
-    boolean canEncode(TypeEggg typeEggg);
+    boolean canGenerate(TypeEggg typeEggg);
 }
