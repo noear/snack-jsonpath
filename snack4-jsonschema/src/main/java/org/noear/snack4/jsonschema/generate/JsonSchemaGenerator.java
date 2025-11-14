@@ -117,26 +117,27 @@ public class JsonSchemaGenerator {
      */
     public ONode generate() {
         try {
-            ONode oNode = generateValueToNode(source0, null);
+            ONode target = new ONode();
 
-            if (oNode != null && (enableSchema || enableDefinitions)) {
-                ONode schema = new ONode();
+            if (enableSchema) {
+                target.set("$schema", version.getIdentifier());
+            }
 
-                if(enableSchema) {
-                    schema.set("$schema", version.getIdentifier());
-                }
+            if (enableDefinitions) {
+                String definitionsKey = getDefinitionsKey();
+                target.getOrNew(definitionsKey);
+            }
 
-                // 如果启用了 definitions 并且有定义内容，添加到根节点
+            ONode oNode = generateValueToNode(source0, null, target);
+
+            if (oNode != null) {
                 if (enableDefinitions && !definitions.isEmpty()) {
                     String definitionsKey = getDefinitionsKey();
-                    schema.getOrNew(definitionsKey).setAll(definitions);
+                    oNode.getOrNew(definitionsKey).setAll(definitions);
                 }
-
-                schema.setAll(oNode.getObject());
-                return schema;
-            } else {
-                return oNode;
             }
+
+            return oNode;
 
         } catch (Throwable e) {
             if (e instanceof RuntimeException) {
@@ -189,28 +190,28 @@ public class JsonSchemaGenerator {
     }
 
     // 值转ONode处理
-    private ONode generateValueToNode(TypeEggg typeEggg, ONodeAttrHolder attr) throws Throwable {
+    private ONode generateValueToNode(TypeEggg typeEggg, ONodeAttrHolder attr, ONode target) throws Throwable {
         // 优先使用自定义编解码器
         TypeGenerator generator = getGenerator(typeEggg);
         if (generator != null) {
-            return generator.generate(attr, typeEggg, new ONode());
+            return generator.generate(attr, typeEggg, target);
         }
 
         if (typeEggg.isCollection()) {
-            return generateCollectionToNode(typeEggg);
+            return generateCollectionToNode(typeEggg, target);
         } else if (typeEggg.isMap()) {
-            return generateMapToNode(typeEggg);
+            return generateMapToNode(typeEggg, target);
         } else {
             if (typeEggg.isArray()) {
-                return generateArrayToNode(typeEggg);
+                return generateArrayToNode(typeEggg, target);
             } else {
-                return generateBeanToNode(typeEggg);
+                return generateBeanToNode(typeEggg, target);
             }
         }
     }
 
     // 对象转ONode核心逻辑
-    private ONode generateBeanToNode(TypeEggg typeEggg) throws Throwable {
+    private ONode generateBeanToNode(TypeEggg typeEggg, ONode target) throws Throwable {
         // 循环引用检测
         if (visited.containsKey(typeEggg)) {
             if (enableDefinitions) {
@@ -226,9 +227,7 @@ public class JsonSchemaGenerator {
             visited.put(typeEggg, null);
         }
 
-        ONode target = new ONode().asObject();
         target.set(SchemaUtil.NAME_TYPE, SchemaUtil.TYPE_OBJECT);
-
 
         // 如果是复杂类型且启用了定义，先创建定义占位符
         String definitionName = null;
@@ -261,10 +260,9 @@ public class JsonSchemaGenerator {
                     continue;
                 }
 
-                ONode propertyNode = generateValueToNode(property.getTypeEggg(), attr);
+                ONode propertyNode = generateValueToNode(property.getTypeEggg(), attr, new ONode());
 
                 if (propertyNode != null) {
-
                     if (Asserts.isNotEmpty(attr.getDescription())) {
                         propertyNode.set(SchemaUtil.NAME_DESCRIPTION, attr.getDescription());
                     }
@@ -303,48 +301,45 @@ public class JsonSchemaGenerator {
     }
 
     // 处理数组类型
-    private ONode generateArrayToNode(TypeEggg typeEggg) throws Throwable {
-        ONode tmp = new ONode();
-        tmp.set(SchemaUtil.NAME_TYPE, SchemaUtil.TYPE_ARRAY);
+    private ONode generateArrayToNode(TypeEggg typeEggg, ONode target) throws Throwable {
+        target.set(SchemaUtil.NAME_TYPE, SchemaUtil.TYPE_ARRAY);
 
-        ONode itemsType = generateValueToNode(EgggUtil.getTypeEggg(typeEggg.getType().getComponentType()), null);
-        tmp.set(SchemaUtil.NAME_ITEMS, itemsType);
+        ONode itemsType = generateValueToNode(EgggUtil.getTypeEggg(typeEggg.getType().getComponentType()), null, new ONode());
+        target.set(SchemaUtil.NAME_ITEMS, itemsType);
 
-        return tmp;
+        return target;
     }
 
     // 处理集合类型
-    private ONode generateCollectionToNode(TypeEggg typeEggg) throws Throwable {
-        ONode tmp = new ONode();
-        tmp.set(SchemaUtil.NAME_TYPE, SchemaUtil.TYPE_ARRAY);
+    private ONode generateCollectionToNode(TypeEggg typeEggg, ONode target) throws Throwable {
+        target.set(SchemaUtil.NAME_TYPE, SchemaUtil.TYPE_ARRAY);
 
         if (typeEggg.isParameterizedType()) {
-            ONode itemsType = generateValueToNode(EgggUtil.getTypeEggg(typeEggg.getActualTypeArguments()[0]), null);
-            tmp.set(SchemaUtil.NAME_ITEMS, itemsType);
+            ONode itemsType = generateValueToNode(EgggUtil.getTypeEggg(typeEggg.getActualTypeArguments()[0]), null, new ONode());
+            target.set(SchemaUtil.NAME_ITEMS, itemsType);
         }
 
-        return tmp;
+        return target;
     }
 
     // 处理Map类型
-    private ONode generateMapToNode(TypeEggg typeEggg) throws Throwable {
-        ONode tmp = new ONode();
-        tmp.set(SchemaUtil.NAME_TYPE, SchemaUtil.TYPE_OBJECT);
+    private ONode generateMapToNode(TypeEggg typeEggg, ONode target) throws Throwable {
+        target.set(SchemaUtil.NAME_TYPE, SchemaUtil.TYPE_OBJECT);
 
         // 对于Map，可以添加additionalProperties来说明值类型
         if (typeEggg.isParameterizedType() && typeEggg.getActualTypeArguments().length > 1) {
             TypeEggg valueEggg = EgggUtil.getTypeEggg(typeEggg.getActualTypeArguments()[1]);
 
             if (valueEggg.getType() != Object.class) {
-                ONode valueSchema = generateValueToNode(valueEggg, null);
-                tmp.set("additionalProperties", valueSchema);
+                ONode valueSchema = generateValueToNode(valueEggg, null, new ONode());
+                target.set("additionalProperties", valueSchema);
             } else {
-                tmp.set("additionalProperties", true);
+                target.set("additionalProperties", true);
             }
         } else {
-            tmp.set("additionalProperties", true);
+            target.set("additionalProperties", true);
         }
 
-        return tmp;
+        return target;
     }
 }
