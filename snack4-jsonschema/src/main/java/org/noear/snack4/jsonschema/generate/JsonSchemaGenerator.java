@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.noear.snack4.jsonschema.codec;
+package org.noear.snack4.jsonschema.generate;
 
 import org.noear.eggg.ClassEggg;
 import org.noear.eggg.Property;
@@ -23,7 +23,7 @@ import org.noear.snack4.ONode;
 import org.noear.snack4.annotation.ONodeAttrHolder;
 import org.noear.snack4.codec.util.EgggUtil;
 import org.noear.snack4.jsonschema.JsonSchemaException;
-import org.noear.snack4.jsonschema.codec.generate.*;
+import org.noear.snack4.jsonschema.generate.impl.*;
 import org.noear.snack4.util.Asserts;
 
 import java.lang.reflect.Type;
@@ -75,28 +75,18 @@ public class JsonSchemaGenerator {
         return tmp;
     }
 
-    /**
-     * Java Object 编码为 ONode
-     */
-    public static ONode generate(Type type) {
-        if (type == null) {
-            return null;
-        }
+
+    private final TypeEggg source0;
+    private final Map<Object, Object> visited;
+
+    public JsonSchemaGenerator(Type type) {
+        Objects.requireNonNull(type, "type");
 
         if (type == void.class) {
             throw new JsonSchemaException("Not support the void type");
         }
 
-        return new JsonSchemaGenerator(EgggUtil.getTypeEggg(type)).generate();
-    }
-
-    private final TypeEggg source0;
-
-    private final Map<Object, Object> visited;
-
-
-    private JsonSchemaGenerator(TypeEggg typeEggg) {
-        this.source0 = typeEggg;
+        this.source0 = EgggUtil.getTypeEggg(type);
         this.visited = new IdentityHashMap<>();
     }
 

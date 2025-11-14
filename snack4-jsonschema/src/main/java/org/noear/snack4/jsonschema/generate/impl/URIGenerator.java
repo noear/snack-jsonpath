@@ -13,35 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.noear.snack4.jsonschema.codec.generate;
+package org.noear.snack4.jsonschema.generate.impl;
 
 import org.noear.eggg.TypeEggg;
 import org.noear.snack4.ONode;
 import org.noear.snack4.annotation.ONodeAttrHolder;
-import org.noear.snack4.jsonschema.codec.SchemaUtil;
-import org.noear.snack4.jsonschema.codec.TypePatternGenerator;
+import org.noear.snack4.jsonschema.generate.SchemaUtil;
+import org.noear.snack4.jsonschema.generate.TypeGenerator;
+
+import java.net.URI;
 
 /**
  *
  * @author noear 2025/11/14 created
  * @since 4.0
  */
-public class _EnumPatternGenerator implements TypePatternGenerator {
-    @Override
-    public boolean canGenerate(TypeEggg typeEggg) {
-        return typeEggg.isEnum();
-    }
-
+public class URIGenerator implements TypeGenerator<URI> {
     @Override
     public ONode generate(ONodeAttrHolder att, TypeEggg typeEggg, ONode target) {
-        target.set(SchemaUtil.NAME_TYPE, SchemaUtil.TYPE_STRING);
-
-        target.getOrNew(SchemaUtil.NAME_ENUM).then(n -> {
-            for (Object e : typeEggg.getType().getEnumConstants()) {
-                n.add(e.toString());
-            }
-        });
-
-        return target;
+        return target.set(SchemaUtil.NAME_TYPE, SchemaUtil.TYPE_STRING)
+                .set(SchemaUtil.NAME_FORMAT, SchemaUtil.FORMAT_URI);
     }
 }

@@ -13,14 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.noear.snack4.jsonschema.codec;
+package org.noear.snack4.jsonschema.generate;
 
-import org.noear.eggg.*;
 import org.noear.snack4.ONode;
 
-import java.lang.reflect.*;
 import java.math.BigDecimal;
-import java.util.*;
 
 /**
  * 架构工具

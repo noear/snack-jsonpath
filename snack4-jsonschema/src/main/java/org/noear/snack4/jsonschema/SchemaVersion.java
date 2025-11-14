@@ -13,17 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.noear.snack4.jsonschema.codec;
-
-import org.noear.eggg.TypeEggg;
-import org.noear.snack4.ONode;
-import org.noear.snack4.annotation.ONodeAttrHolder;
+package org.noear.snack4.jsonschema;
 
 /**
  *
  * @author noear 2025/11/14 created
  * @since 4.0
  */
-public interface TypeGenerator<T> {
-    ONode generate(ONodeAttrHolder att, TypeEggg typeEggg, ONode target);
+public enum SchemaVersion {
+    DRAFT_7("http://json-schema.org/draft-07/schema#"),
+    DRAFT_2019_09("https://json-schema.org/draft/2019-09/schema"),
+    DRAFT_2020_12("https://json-schema.org/draft/2020-12/schema");
+
+    private final String identifier;
+
+    private SchemaVersion(String schemaIdentifier) {
+        this.identifier = schemaIdentifier;
+    }
+
+    public String getIdentifier() {
+        return this.identifier;
+    }
 }

@@ -13,31 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.noear.snack4.jsonschema.codec.generate;
+package org.noear.snack4.jsonschema.generate.impl;
 
 import org.noear.eggg.TypeEggg;
 import org.noear.snack4.ONode;
 import org.noear.snack4.annotation.ONodeAttrHolder;
-import org.noear.snack4.jsonschema.codec.SchemaUtil;
-import org.noear.snack4.jsonschema.codec.TypeGenerator;
+import org.noear.snack4.jsonschema.generate.SchemaUtil;
+import org.noear.snack4.jsonschema.generate.TypeGenerator;
 
 /**
  *
  * @author noear 2025/11/14 created
  *
  */
-public class CharGenerator implements TypeGenerator {
-    private static final CharGenerator instance = new CharGenerator();
-
-    public static CharGenerator getInstance() {
+public class BooleanGenerator implements TypeGenerator {
+    private static final BooleanGenerator instance = new BooleanGenerator();
+    public static BooleanGenerator getInstance() {
         return instance;
     }
 
-
     @Override
     public ONode generate(ONodeAttrHolder att, TypeEggg typeEggg, ONode target) {
-        return target.set(SchemaUtil.NAME_TYPE, SchemaUtil.TYPE_STRING)
-                .set("maxLength", 1)
-                .set("minLength", 1);
+        return target.set(SchemaUtil.NAME_TYPE, SchemaUtil.TYPE_BOOLEAN);
     }
 }

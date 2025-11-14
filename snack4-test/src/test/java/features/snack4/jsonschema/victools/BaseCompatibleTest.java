@@ -16,8 +16,17 @@ public class BaseCompatibleTest {
 
     public BaseCompatibleTest() {
         // 选择所需的JSON Schema版本和配置预设
-        SchemaGeneratorConfigBuilder configBuilder =
-                new SchemaGeneratorConfigBuilder(SchemaVersion.DRAFT_2020_12, OptionPreset.PLAIN_JSON);
+        SchemaGeneratorConfigBuilder configBuilder = new SchemaGeneratorConfigBuilder(
+                SchemaVersion.DRAFT_7,
+                OptionPreset.PLAIN_JSON);
+
+        configBuilder
+                .without(Option.DEFINITIONS_FOR_ALL_OBJECTS)
+                .without(Option.DEFINITIONS_FOR_MEMBER_SUPERTYPES)
+                .without(Option.DEFINITION_FOR_MAIN_SCHEMA)
+                .with(Option.FLATTENED_SUPPLIERS)
+                .with(Option.FLATTENED_OPTIONALS)
+                .with(Option.FLATTENED_ENUMS);
 
         // --- 1. 定制字段名称 (Name Override) 和 忽略 (Ignore) ---
         configBuilder.forFields()
