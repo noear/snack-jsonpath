@@ -80,7 +80,7 @@ public class JsonSchemaGenerator {
     private final Map<Object, Object> visited;
     private SchemaVersion version = SchemaVersion.DRAFT_7;
     private boolean enableDefinitions;
-    private boolean enableSchema;
+    private boolean printVersion;
 
     private final Map<String, ONode> definitions;
     private int definitionCounter = 0;
@@ -95,8 +95,8 @@ public class JsonSchemaGenerator {
         return this;
     }
 
-    public JsonSchemaGenerator withEnableSchema(boolean enableSchema) {
-        this.enableSchema = enableSchema;
+    public JsonSchemaGenerator withPrintVersion(boolean printVersion) {
+        this.printVersion = printVersion;
         return this;
     }
 
@@ -119,7 +119,7 @@ public class JsonSchemaGenerator {
         try {
             ONode target = new ONode();
 
-            if (enableSchema) {
+            if (printVersion) {
                 target.set("$schema", version.getIdentifier());
             }
 
@@ -221,8 +221,11 @@ public class JsonSchemaGenerator {
                     return createReference(definitionName);
                 }
             }
-
-            return null;
+            // 即使没有启用定义，也要返回一个占位符而不是null
+            ONode placeholder = new ONode().asObject();
+            placeholder.set(SchemaUtil.NAME_TYPE, SchemaUtil.TYPE_OBJECT);
+            placeholder.set("description", "Circular reference to " + typeEggg.getType().getSimpleName());
+            return placeholder;
         } else {
             visited.put(typeEggg, null);
         }

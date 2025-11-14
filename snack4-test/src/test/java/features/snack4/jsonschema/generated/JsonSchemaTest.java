@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.noear.snack4.ONode;
 import org.noear.snack4.annotation.ONodeAttr;
 import org.noear.snack4.jsonschema.JsonSchema;
+import org.noear.snack4.jsonschema.generate.JsonSchemaGenerator;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -563,7 +564,9 @@ class JsonSchemaTest {
     @Test
     void testOfType_CircularReference() {
         // 测试循环引用场景
-        JsonSchema schema = JsonSchema.ofType(CircularReference.class);
+        ONode schema = new JsonSchemaGenerator(CircularReference.class)
+                .withEnableDefinitions(true)
+                .generate();
         String json = schema.toJson();
 
         System.out.println(json);
