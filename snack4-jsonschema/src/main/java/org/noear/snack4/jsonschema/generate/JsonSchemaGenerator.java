@@ -76,11 +76,13 @@ public class JsonSchemaGenerator {
         return tmp;
     }
 
-
     private final TypeEggg source0;
     private final Map<Object, Object> visited;
-    private SchemaVersion version;
+    private SchemaVersion version = SchemaVersion.DRAFT_7;
     private boolean enableDefinitions;
+
+    private final Map<String, ONode> definitions;
+    private int definitionCounter = 0;
 
     public JsonSchemaGenerator withVersion(SchemaVersion version) {
         this.version = version;
@@ -101,6 +103,7 @@ public class JsonSchemaGenerator {
 
         this.source0 = EgggUtil.getTypeEggg(type);
         this.visited = new IdentityHashMap<>();
+        this.definitions = new LinkedHashMap<>();
     }
 
     /**
@@ -108,7 +111,25 @@ public class JsonSchemaGenerator {
      */
     public ONode generate() {
         try {
-            return generateValueToNode(source0, null);
+            ONode oNode = generateValueToNode(source0, null);
+
+            if (oNode != null) {
+                ONode schema = new ONode();
+
+                schema.set("$schema", version.getIdentifier());
+
+                // 如果启用了 definitions 并且有定义内容，添加到根节点
+                if (enableDefinitions && !definitions.isEmpty()) {
+                    String definitionsKey = getDefinitionsKey();
+                    schema.getOrNew(definitionsKey).setAll(definitions);
+                }
+
+                schema.setAll(oNode.getObject());
+                return schema;
+            } else {
+                return null;
+            }
+
         } catch (Throwable e) {
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;
@@ -118,12 +139,51 @@ public class JsonSchemaGenerator {
         }
     }
 
+    // 获取定义键名，根据版本使用不同的关键字
+    private String getDefinitionsKey() {
+        switch (version) {
+            case DRAFT_7:
+                return "definitions";
+            case DRAFT_2019_09:
+            case DRAFT_2020_12:
+            default:
+                return "$defs";
+        }
+    }
+
+    // 判断是否应该为类型创建定义
+    private boolean shouldCreateDefinition(TypeEggg typeEggg) {
+        // 为自定义类创建定义，排除基本类型和系统类
+        Class<?> clazz = typeEggg.getType();
+        return !clazz.isPrimitive() &&
+                !clazz.getName().startsWith("java.") &&
+                !clazz.getName().startsWith("javax.");
+    }
+
+    // 获取定义名称
+    private String getDefinitionName(TypeEggg typeEggg) {
+        Class<?> clazz = typeEggg.getType();
+        String simpleName = clazz.getSimpleName();
+        if (simpleName.isEmpty()) {
+            // 对于匿名类等，使用生成的名称
+            return "Definition_" + (definitionCounter++);
+        }
+        return simpleName;
+    }
+
+    // 创建引用节点
+    private ONode createReference(String definitionName) {
+        ONode refNode = new ONode().asObject();
+        refNode.set("$ref", "#/" + getDefinitionsKey() + "/" + definitionName);
+        return refNode;
+    }
+
     // 值转ONode处理
     private ONode generateValueToNode(TypeEggg typeEggg, ONodeAttrHolder attr) throws Throwable {
         // 优先使用自定义编解码器
-        TypeGenerator codec = getGenerator(typeEggg);
-        if (codec != null) {
-            return codec.generate(attr, typeEggg, new ONode());
+        TypeGenerator generator = getGenerator(typeEggg);
+        if (generator != null) {
+            return generator.generate(attr, typeEggg, new ONode());
         }
 
         if (typeEggg.isCollection()) {
@@ -143,18 +203,35 @@ public class JsonSchemaGenerator {
     private ONode generateBeanToNode(TypeEggg typeEggg) throws Throwable {
         // 循环引用检测
         if (visited.containsKey(typeEggg)) {
+            if (enableDefinitions) {
+                // 如果启用了定义，为循环引用创建引用
+                String definitionName = getDefinitionName(typeEggg);
+                if (definitions.containsKey(definitionName)) {
+                    return createReference(definitionName);
+                }
+            }
+
             return null;
         } else {
             visited.put(typeEggg, null);
         }
 
         ONode target = new ONode().asObject();
-
         target.set(SchemaUtil.NAME_TYPE, SchemaUtil.TYPE_OBJECT);
-        ONode oProperties = target.getOrNew(SchemaUtil.NAME_PROPERTIES).asObject();
-        ONode oRequired = target.getOrNew(SchemaUtil.NAME_REQUIRED).asArray();
+
+
+        // 如果是复杂类型且启用了定义，先创建定义占位符
+        String definitionName = null;
+        if (enableDefinitions && shouldCreateDefinition(typeEggg)) {
+            definitionName = getDefinitionName(typeEggg);
+            definitions.put(definitionName, target); // 先放入占位符
+        }
+
 
         try {
+            ONode oProperties = target.getOrNew(SchemaUtil.NAME_PROPERTIES).asObject();
+            ONode oRequired = target.getOrNew(SchemaUtil.NAME_REQUIRED).asArray();
+
             ClassEggg classEggg = typeEggg.getClassEggg();
 
             for (PropertyEggg pw : classEggg.getPropertyEgggs()) {
@@ -203,11 +280,16 @@ public class JsonSchemaGenerator {
                     }
                 }
             }
+
+            // 如果启用了定义，返回引用而不是完整的对象
+            if (enableDefinitions && definitionName != null) {
+                return createReference(definitionName);
+            }
+
+            return target;
         } finally {
             visited.remove(typeEggg);
         }
-
-        return target;
     }
 
     // 处理数组类型
@@ -238,6 +320,15 @@ public class JsonSchemaGenerator {
     private ONode generateMapToNode(TypeEggg typeEggg) throws Throwable {
         ONode tmp = new ONode();
         tmp.set(SchemaUtil.NAME_TYPE, SchemaUtil.TYPE_OBJECT);
+
+        // 对于Map，可以添加additionalProperties来说明值类型
+        if (typeEggg.isParameterizedType() && typeEggg.getActualTypeArguments().length > 1) {
+            ONode valueType = generateValueToNode(EgggUtil.getTypeEggg(typeEggg.getActualTypeArguments()[1]), null);
+            tmp.set("additionalProperties", valueType);
+        } else {
+            tmp.set("additionalProperties", true);
+        }
+
         return tmp;
     }
 }
