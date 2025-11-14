@@ -30,10 +30,14 @@ public class SchemaUtil {
     public static final String NAME_TITLE = "title";
     public static final String NAME_DESCRIPTION = "description";
     public static final String NAME_FORMAT = "format";
-    public static final String NAME_PROPERTIES = "properties";
     public static final String NAME_REQUIRED = "required";
     public static final String NAME_ITEMS = "items";
     public static final String NAME_ENUM = "enum";
+    public static final String NAME_PROPERTIES = "properties";
+    public static final String NAME_ADDITIONAL_PROPERTIES = "additionalProperties";
+
+    public static final String NAME_REF = "$ref";
+    public static final String NAME_SCHEMA = "$schema";
 
     public static final String FORMAT_URI = "uri";
     public static final String FORMAT_DATE_TIME = "date-time";

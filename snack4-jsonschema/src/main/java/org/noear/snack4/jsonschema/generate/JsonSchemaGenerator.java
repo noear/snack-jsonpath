@@ -33,6 +33,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 对象编码器
@@ -42,7 +43,7 @@ import java.util.*;
  */
 public class JsonSchemaGenerator {
     static final List<TypePatternGenerator> TYPE_PATTERN_GENERATORS = new ArrayList<>();
-    static final Map<Class<?>, TypeGenerator> TYPE_GENERATOR_MAP = new HashMap<>();
+    static final Map<Class<?>, TypeGenerator> TYPE_GENERATOR_MAP = new ConcurrentHashMap<>();
 
     static {
         TYPE_PATTERN_GENERATORS.add(new _DatePatternGenerator());
@@ -68,6 +69,7 @@ public class JsonSchemaGenerator {
         if (tmp == null) {
             for (TypePatternGenerator b1 : TYPE_PATTERN_GENERATORS) {
                 if (b1.canGenerate(typeEggg)) {
+                    TYPE_GENERATOR_MAP.putIfAbsent(typeEggg.getType(), b1);
                     return b1;
                 }
             }
@@ -120,7 +122,7 @@ public class JsonSchemaGenerator {
             ONode target = new ONode();
 
             if (printVersion) {
-                target.set("$schema", version.getIdentifier());
+                target.set(SchemaUtil.NAME_SCHEMA, version.getIdentifier());
             }
 
             if (enableDefinitions) {
@@ -185,7 +187,7 @@ public class JsonSchemaGenerator {
     // 创建引用节点
     private ONode createReference(String definitionName) {
         ONode refNode = new ONode().asObject();
-        refNode.set("$ref", "#/" + getDefinitionsKey() + "/" + definitionName);
+        refNode.set(SchemaUtil.NAME_REF, "#/" + getDefinitionsKey() + "/" + definitionName);
         return refNode;
     }
 
@@ -224,7 +226,7 @@ public class JsonSchemaGenerator {
             // 即使没有启用定义，也要返回一个占位符而不是null
             ONode placeholder = new ONode().asObject();
             placeholder.set(SchemaUtil.NAME_TYPE, SchemaUtil.TYPE_OBJECT);
-            placeholder.set("description", "Circular reference to " + typeEggg.getType().getSimpleName());
+            placeholder.set(SchemaUtil.NAME_DESCRIPTION, "Circular reference to " + typeEggg.getType().getSimpleName());
             return placeholder;
         } else {
             visited.put(typeEggg, null);
@@ -335,12 +337,12 @@ public class JsonSchemaGenerator {
 
             if (valueEggg.getType() != Object.class) {
                 ONode valueSchema = generateValueToNode(valueEggg, null, new ONode());
-                target.set("additionalProperties", valueSchema);
+                target.set(SchemaUtil.NAME_ADDITIONAL_PROPERTIES, valueSchema);
             } else {
-                target.set("additionalProperties", true);
+                target.set(SchemaUtil.NAME_ADDITIONAL_PROPERTIES, true);
             }
         } else {
-            target.set("additionalProperties", true);
+            target.set(SchemaUtil.NAME_ADDITIONAL_PROPERTIES, true);
         }
 
         return target;
