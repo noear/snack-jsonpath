@@ -37,6 +37,11 @@ public class SchemaUtil {
     public static final String NAME_ITEMS = "items";
     public static final String NAME_ENUM = "enum";
 
+    public static final String FORMAT_URI = "uri";
+    public static final String FORMAT_DATE_TIME = "date-time";
+    public static final String FORMAT_DATE = "date";
+    public static final String FORMAT_TIME = "time";
+
     public static final String TYPE_OBJECT = "object";
     public static final String TYPE_ARRAY = "array";
     public static final String TYPE_STRING = "string";

@@ -206,10 +206,10 @@ public class JsonSchemaGenerator {
     // 处理数组类型
     private ONode generateArrayToNode(TypeEggg typeEggg) throws Throwable {
         ONode tmp = new ONode();
-        tmp.set("type", SchemaUtil.TYPE_ARRAY);
+        tmp.set(SchemaUtil.NAME_TYPE, SchemaUtil.TYPE_ARRAY);
 
         ONode itemsType = generateValueToNode(EgggUtil.getTypeEggg(typeEggg.getType().getComponentType()), null);
-        tmp.set("items", itemsType);
+        tmp.set(SchemaUtil.NAME_ITEMS, itemsType);
 
         return tmp;
     }
@@ -217,11 +217,11 @@ public class JsonSchemaGenerator {
     // 处理集合类型
     private ONode generateCollectionToNode(TypeEggg typeEggg) throws Throwable {
         ONode tmp = new ONode();
-        tmp.set("type", SchemaUtil.TYPE_ARRAY);
+        tmp.set(SchemaUtil.NAME_TYPE, SchemaUtil.TYPE_ARRAY);
 
         if (typeEggg.isParameterizedType()) {
             ONode itemsType = generateValueToNode(EgggUtil.getTypeEggg(typeEggg.getActualTypeArguments()[0]), null);
-            tmp.set("items", itemsType);
+            tmp.set(SchemaUtil.NAME_ITEMS, itemsType);
         }
 
         return tmp;
@@ -230,7 +230,7 @@ public class JsonSchemaGenerator {
     // 处理Map类型
     private ONode generateMapToNode(TypeEggg typeEggg) throws Throwable {
         ONode tmp = new ONode();
-        tmp.set("type", SchemaUtil.TYPE_OBJECT);
+        tmp.set(SchemaUtil.NAME_TYPE, SchemaUtil.TYPE_OBJECT);
         return tmp;
     }
 }

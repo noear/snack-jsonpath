@@ -36,7 +36,7 @@ public class _DatePatternGenerator implements TypePatternGenerator {
 
     @Override
     public ONode generate(ONodeAttrHolder att, TypeEggg typeEggg, ONode target) {
-        return target.set("type", SchemaUtil.TYPE_STRING)
-                .set("format", "date-time");
+        return target.set(SchemaUtil.NAME_TYPE, SchemaUtil.TYPE_STRING)
+                .set(SchemaUtil.NAME_FORMAT, SchemaUtil.FORMAT_DATE_TIME);
     }
 }

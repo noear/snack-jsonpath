@@ -34,6 +34,6 @@ public class BooleanGenerator implements TypeGenerator {
 
     @Override
     public ONode generate(ONodeAttrHolder att, TypeEggg typeEggg, ONode target) {
-        return target.set("type", SchemaUtil.TYPE_BOOLEAN);
+        return target.set(SchemaUtil.NAME_TYPE, SchemaUtil.TYPE_BOOLEAN);
     }
 }

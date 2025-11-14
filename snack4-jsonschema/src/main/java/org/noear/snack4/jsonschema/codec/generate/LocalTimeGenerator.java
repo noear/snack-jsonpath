@@ -31,7 +31,7 @@ import java.time.LocalTime;
 public class LocalTimeGenerator implements TypeGenerator<LocalTime> {
     @Override
     public ONode generate(ONodeAttrHolder att, TypeEggg typeEggg, ONode target) {
-        return target.set("type", SchemaUtil.TYPE_STRING)
-                .set("format", "time");
+        return target.set(SchemaUtil.NAME_TYPE, SchemaUtil.TYPE_STRING)
+                .set(SchemaUtil.NAME_FORMAT, SchemaUtil.FORMAT_TIME);
     }
 }

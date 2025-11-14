@@ -31,7 +31,7 @@ import java.net.URI;
 public class URIGenerator implements TypeGenerator<URI> {
     @Override
     public ONode generate(ONodeAttrHolder att, TypeEggg typeEggg, ONode target) {
-        return target.set("type", SchemaUtil.TYPE_STRING)
-                .set("format", "uri");
+        return target.set(SchemaUtil.NAME_TYPE, SchemaUtil.TYPE_STRING)
+                .set(SchemaUtil.NAME_FORMAT, SchemaUtil.FORMAT_URI);
     }
 }

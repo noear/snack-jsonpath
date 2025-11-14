@@ -85,8 +85,8 @@ public class JsonSchema {
         }
 
         // 处理类型校验
-        if (schemaNode.hasKey("type")) {
-            validateType(schemaNode.get("type"), dataNode, path);
+        if (schemaNode.hasKey(SchemaUtil.NAME_TYPE)) {
+            validateType(schemaNode.get(SchemaUtil.NAME_TYPE), dataNode, path);
         }
 
         // 处理枚举校验
@@ -364,8 +364,8 @@ public class JsonSchema {
     private void compileSchemaRecursive(ONode schemaNode, Map<String, CompiledRule> rules, PathTracker path) {
         List<ValidationRule> localRules = new ArrayList<>();
 
-        if (schemaNode.hasKey("type")) {
-            localRules.add(new TypeRule(schemaNode.get("type")));
+        if (schemaNode.hasKey(SchemaUtil.NAME_TYPE)) {
+            localRules.add(new TypeRule(schemaNode.get(SchemaUtil.NAME_TYPE)));
         }
         if (schemaNode.hasKey("enum")) {
             localRules.add(new EnumRule(schemaNode.get("enum")));

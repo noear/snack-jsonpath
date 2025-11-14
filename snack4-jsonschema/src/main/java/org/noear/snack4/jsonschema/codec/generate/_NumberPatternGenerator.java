@@ -43,9 +43,9 @@ public class _NumberPatternGenerator implements TypePatternGenerator {
                 type.equals(Integer.class) || type.equals(int.class) ||
                 type.equals(Long.class) || type.equals(long.class) ||
                 type.equals(BigInteger.class)) {
-            target.set("type", SchemaUtil.TYPE_INTEGER);
+            target.set(SchemaUtil.NAME_TYPE, SchemaUtil.TYPE_INTEGER);
         } else {
-            target.set("type", SchemaUtil.TYPE_NUMBER);
+            target.set(SchemaUtil.NAME_TYPE, SchemaUtil.TYPE_NUMBER);
         }
 
         return target;
