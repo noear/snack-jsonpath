@@ -27,9 +27,10 @@ import java.math.BigDecimal;
  */
 public class SchemaUtil {
     public static final String NAME_TYPE = "type";
+    public static final String NAME_TITLE = "title";
+    public static final String NAME_DESCRIPTION = "description";
     public static final String NAME_FORMAT = "format";
     public static final String NAME_PROPERTIES = "properties";
-    public static final String NAME_DESCRIPTION = "description";
     public static final String NAME_REQUIRED = "required";
     public static final String NAME_ITEMS = "items";
     public static final String NAME_ENUM = "enum";

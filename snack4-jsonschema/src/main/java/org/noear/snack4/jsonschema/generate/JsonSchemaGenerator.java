@@ -169,6 +169,10 @@ public class JsonSchemaGenerator {
                         propertyNode.set(SchemaUtil.NAME_DESCRIPTION, attr.getDescription());
                     }
 
+                    if (Asserts.isNotEmpty(attr.getTitle())) {
+                        propertyNode.set(SchemaUtil.NAME_TITLE, attr.getTitle());
+                    }
+
                     if (attr.isFlat()) {
                         if (propertyNode.isObject()) {
                             oProperties.setAll(propertyNode.getObject());

@@ -1,5 +1,7 @@
 package features.snack4.jsonschema.victools;
 
+import org.noear.snack4.annotation.ONodeAttr;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -17,8 +19,10 @@ public class TestSampleEntity {
 
     // 基本数据类型
     private boolean primitiveBoolean;
+    @ONodeAttr(description = "测试1")
     private byte primitiveByte;
     private short primitiveShort;
+    @ONodeAttr(title = "测试2")
     private int primitiveInt;
     private long primitiveLong;
     private float primitiveFloat;

@@ -34,6 +34,7 @@ import java.util.TimeZone;
  */
 public class ONodeAttrHolder {
     private String alias;
+    private String title;
     private String description;
 
     private String format;
@@ -52,6 +53,7 @@ public class ONodeAttrHolder {
     public ONodeAttrHolder(ONodeAttr attrAnno, String realName) {
         if (attrAnno != null) {
             alias = attrAnno.name();
+            title = attrAnno.title();
             description = attrAnno.description();
 
             format = attrAnno.format();
@@ -95,6 +97,10 @@ public class ONodeAttrHolder {
 
     public String getAlias() {
         return alias;
+    }
+
+    public String getTitle() {
+        return title;
     }
 
     public String getDescription() {
