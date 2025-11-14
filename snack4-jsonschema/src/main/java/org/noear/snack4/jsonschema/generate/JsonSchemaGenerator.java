@@ -80,6 +80,7 @@ public class JsonSchemaGenerator {
     private final Map<Object, Object> visited;
     private SchemaVersion version = SchemaVersion.DRAFT_7;
     private boolean enableDefinitions;
+    private boolean enableSchema;
 
     private final Map<String, ONode> definitions;
     private int definitionCounter = 0;
@@ -91,6 +92,11 @@ public class JsonSchemaGenerator {
 
     public JsonSchemaGenerator withEnableDefinitions(boolean enableDefinitions) {
         this.enableDefinitions = enableDefinitions;
+        return this;
+    }
+
+    public JsonSchemaGenerator withEnableSchema(boolean enableSchema) {
+        this.enableSchema = enableSchema;
         return this;
     }
 
@@ -113,10 +119,12 @@ public class JsonSchemaGenerator {
         try {
             ONode oNode = generateValueToNode(source0, null);
 
-            if (oNode != null) {
+            if (oNode != null && (enableSchema || enableDefinitions)) {
                 ONode schema = new ONode();
 
-                schema.set("$schema", version.getIdentifier());
+                if(enableSchema) {
+                    schema.set("$schema", version.getIdentifier());
+                }
 
                 // 如果启用了 definitions 并且有定义内容，添加到根节点
                 if (enableDefinitions && !definitions.isEmpty()) {
@@ -127,7 +135,7 @@ public class JsonSchemaGenerator {
                 schema.setAll(oNode.getObject());
                 return schema;
             } else {
-                return null;
+                return oNode;
             }
 
         } catch (Throwable e) {
@@ -153,11 +161,13 @@ public class JsonSchemaGenerator {
 
     // 判断是否应该为类型创建定义
     private boolean shouldCreateDefinition(TypeEggg typeEggg) {
+        if (source0.equals(typeEggg)) {
+            return false;
+        }
+
         // 为自定义类创建定义，排除基本类型和系统类
         Class<?> clazz = typeEggg.getType();
-        return !clazz.isPrimitive() &&
-                !clazz.getName().startsWith("java.") &&
-                !clazz.getName().startsWith("javax.");
+        return !clazz.isPrimitive() && !typeEggg.isJdkType();
     }
 
     // 获取定义名称
@@ -323,8 +333,14 @@ public class JsonSchemaGenerator {
 
         // 对于Map，可以添加additionalProperties来说明值类型
         if (typeEggg.isParameterizedType() && typeEggg.getActualTypeArguments().length > 1) {
-            ONode valueType = generateValueToNode(EgggUtil.getTypeEggg(typeEggg.getActualTypeArguments()[1]), null);
-            tmp.set("additionalProperties", valueType);
+            TypeEggg valueEggg = EgggUtil.getTypeEggg(typeEggg.getActualTypeArguments()[1]);
+
+            if (valueEggg.getType() != Object.class) {
+                ONode valueSchema = generateValueToNode(valueEggg, null);
+                tmp.set("additionalProperties", valueSchema);
+            } else {
+                tmp.set("additionalProperties", true);
+            }
         } else {
             tmp.set("additionalProperties", true);
         }

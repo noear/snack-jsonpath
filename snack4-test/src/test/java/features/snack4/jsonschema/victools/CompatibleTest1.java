@@ -15,7 +15,8 @@ public class CompatibleTest1 extends BaseCompatibleTest {
         System.out.println(json);
 
         String json2 = new JsonSchemaGenerator(TestSampleEntity.class)
-                .withEnableDefinitions(true)
+                .withEnableSchema(false)
+                .withEnableDefinitions(false)
                 .generate()
                 .toJson();
 

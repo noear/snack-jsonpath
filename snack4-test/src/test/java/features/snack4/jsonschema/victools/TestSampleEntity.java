@@ -66,6 +66,7 @@ public class TestSampleEntity {
 
     // 静态嵌套类 - 地址信息
     public static class Address {
+        @ONodeAttr(description = "国家")
         private String country;
         private String province;
         private String city;
