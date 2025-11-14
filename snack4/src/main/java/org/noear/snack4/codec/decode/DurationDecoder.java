@@ -29,10 +29,8 @@ import java.time.Duration;
 public class DurationDecoder implements ObjectDecoder<Duration> {
     @Override
     public Duration decode(DecodeContext ctx, ONode node) {
-        if (node.isEmpty()) {
-            return null;
-        } else {
-            String tmp = node.getString().toUpperCase();
+        if (node.isNotEmptyString()) {
+            String tmp = node.<String>getValueAs().toUpperCase();
             if (tmp.indexOf('P') != 0) {
                 if (tmp.indexOf('D') > 0) {
                     tmp = "P" + tmp;
@@ -42,6 +40,8 @@ public class DurationDecoder implements ObjectDecoder<Duration> {
             }
 
             return Duration.parse(tmp);
+        } else {
+            return null;
         }
     }
 }

@@ -19,6 +19,7 @@ import org.noear.snack4.ONode;
 import org.noear.snack4.codec.DecodeContext;
 import org.noear.snack4.codec.ObjectPatternDecoder;
 
+import java.time.ZoneId;
 import java.util.TimeZone;
 
 /**
@@ -34,6 +35,10 @@ public class _TimeZonePatternDecoder implements ObjectPatternDecoder<TimeZone> {
 
     @Override
     public TimeZone decode(DecodeContext ctx, ONode node) {
-        return TimeZone.getTimeZone(node.getString());
+        if (node.isNotEmptyString()) {
+            return TimeZone.getTimeZone(ZoneId.of(node.<String>getValueAs()));
+        } else {
+            return null;
+        }
     }
 }

@@ -34,6 +34,10 @@ public class _CharsetPatternDecoder implements ObjectPatternDecoder<Charset> {
 
     @Override
     public Charset decode(DecodeContext<Charset> ctx, ONode node) {
-        return Charset.forName(node.getString());
+        if (node.isNotEmptyString()) {
+            return Charset.forName(node.<String>getValueAs());
+        } else {
+            return null;
+        }
     }
 }

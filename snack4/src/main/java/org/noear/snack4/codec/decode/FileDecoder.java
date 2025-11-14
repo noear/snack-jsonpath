@@ -30,8 +30,8 @@ import java.io.File;
 public class FileDecoder implements ObjectDecoder<File> {
     @Override
     public File decode(DecodeContext ctx, ONode node) {
-        if (node.isString()) {
-            return new File(node.getString());
+        if (node.isNotEmptyString()) {
+            return new File(node.<String>getValueAs());
         }
 
         throw new CodecException("Cannot be converted to File: " + node);

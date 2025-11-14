@@ -30,8 +30,8 @@ import java.text.SimpleDateFormat;
 public class SimpleDateFormatDecoder implements ObjectDecoder<SimpleDateFormat> {
     @Override
     public SimpleDateFormat decode(DecodeContext ctx, ONode node) {
-        if (node.isString()) {
-            return new SimpleDateFormat(node.getString());
+        if (node.isNotEmptyString()) {
+            return new SimpleDateFormat(node.<String>getValueAs());
         } else if (node.isObject()) {
             String pattern = node.get("pattern").getString();
             return new SimpleDateFormat(pattern);

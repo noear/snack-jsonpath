@@ -115,7 +115,7 @@ public final class ONode {
     }
 
     public boolean isNotEmptyString() {
-        return type == DataType.String && Asserts.isNotEmpty(this.<String>getValueAs());
+        return isString() && this.<String>getValueAs().length() > 0;
     }
 
     public boolean isDate() {

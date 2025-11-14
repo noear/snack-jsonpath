@@ -35,6 +35,10 @@ public class _CurrencytPatternDecoder implements ObjectPatternDecoder<Currency> 
 
     @Override
     public Currency decode(DecodeContext<Currency> ctx, ONode node) {
-        return Currency.getInstance(node.getString());
+        if (node.isNotEmptyString()) {
+            return Currency.getInstance(node.<String>getValueAs());
+        } else {
+            return null;
+        }
     }
 }

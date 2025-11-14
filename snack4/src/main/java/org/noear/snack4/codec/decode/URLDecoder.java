@@ -32,7 +32,11 @@ public class URLDecoder implements ObjectDecoder<URL> {
     @Override
     public URL decode(DecodeContext ctx, ONode node) {
         try {
-            return URI.create(node.getString()).toURL();
+            if (node.isNotEmptyString()) {
+                return URI.create(node.<String>getValueAs()).toURL();
+            } else {
+                return null;
+            }
         } catch (Exception e) {
             throw new CodecException(e);
         }
