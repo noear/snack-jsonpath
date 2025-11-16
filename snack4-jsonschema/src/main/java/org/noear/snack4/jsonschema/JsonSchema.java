@@ -18,7 +18,6 @@ package org.noear.snack4.jsonschema;
 import org.noear.snack4.ONode;
 import org.noear.snack4.jsonschema.generate.JsonSchemaGenerator;
 import org.noear.snack4.jsonschema.rule.*;
-import org.noear.snack4.jsonschema.generate.SchemaUtil;
 import org.noear.snack4.util.Asserts;
 
 import java.io.UnsupportedEncodingException;
@@ -318,8 +317,8 @@ public class JsonSchema {
         List<ValidationRule> localRules = new ArrayList<>();
 
         // 类型规则
-        if (schemaNode.hasKey(SchemaUtil.NAME_TYPE)) {
-            localRules.add(new TypeRule(schemaNode.get(SchemaUtil.NAME_TYPE)));
+        if (schemaNode.hasKey(SchemaKeywords.KEYWORD_TYPE)) {
+            localRules.add(new TypeRule(schemaNode.get(SchemaKeywords.KEYWORD_TYPE)));
         }
         // 枚举规则
         if (schemaNode.hasKey("enum")) {

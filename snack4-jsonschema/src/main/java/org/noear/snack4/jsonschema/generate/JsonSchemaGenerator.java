@@ -23,6 +23,7 @@ import org.noear.snack4.ONode;
 import org.noear.snack4.annotation.ONodeAttrHolder;
 import org.noear.snack4.codec.util.EgggUtil;
 import org.noear.snack4.jsonschema.JsonSchemaException;
+import org.noear.snack4.jsonschema.SchemaKeywords;
 import org.noear.snack4.jsonschema.SchemaVersion;
 import org.noear.snack4.jsonschema.generate.impl.*;
 import org.noear.snack4.util.Asserts;
@@ -122,7 +123,7 @@ public class JsonSchemaGenerator {
             ONode target = new ONode();
 
             if (printVersion) {
-                target.set(SchemaUtil.NAME_SCHEMA, version.getIdentifier());
+                target.set(SchemaKeywords.KEYWORD_SCHEMA, version.getIdentifier());
             }
 
             if (enableDefinitions) {
@@ -154,11 +155,11 @@ public class JsonSchemaGenerator {
     private String getDefinitionsKey() {
         switch (version) {
             case DRAFT_7:
-                return SchemaUtil.KEYWORD_DEFINITIONS;
+                return SchemaKeywords.KEYWORD_DEFINITIONS;
             case DRAFT_2019_09:
             case DRAFT_2020_12:
             default:
-                return SchemaUtil.KEYWORD_DEFS;
+                return SchemaKeywords.KEYWORD_DEFS;
         }
     }
 
@@ -187,7 +188,7 @@ public class JsonSchemaGenerator {
     // 创建引用节点
     private ONode createReference(String definitionName) {
         ONode refNode = new ONode().asObject();
-        refNode.set(SchemaUtil.NAME_REF, "#/" + getDefinitionsKey() + "/" + definitionName);
+        refNode.set(SchemaKeywords.KEYWORD_REF, "#/" + getDefinitionsKey() + "/" + definitionName);
         return refNode;
     }
 
@@ -225,14 +226,14 @@ public class JsonSchemaGenerator {
             }
             // 即使没有启用定义，也要返回一个占位符而不是null
             ONode placeholder = new ONode().asObject();
-            placeholder.set(SchemaUtil.NAME_TYPE, SchemaUtil.TYPE_OBJECT);
-            placeholder.set(SchemaUtil.NAME_DESCRIPTION, "Circular reference to " + typeEggg.getType().getSimpleName());
+            placeholder.set(SchemaKeywords.KEYWORD_TYPE, SchemaKeywords.TYPE_OBJECT);
+            placeholder.set(SchemaKeywords.KEYWORD_DESCRIPTION, "Circular reference to " + typeEggg.getType().getSimpleName());
             return placeholder;
         } else {
             visited.put(typeEggg, null);
         }
 
-        target.set(SchemaUtil.NAME_TYPE, SchemaUtil.TYPE_OBJECT);
+        target.set(SchemaKeywords.KEYWORD_TYPE, SchemaKeywords.TYPE_OBJECT);
 
         // 如果是复杂类型且启用了定义，先创建定义占位符
         String definitionName = null;
@@ -243,8 +244,8 @@ public class JsonSchemaGenerator {
 
 
         try {
-            ONode oProperties = target.getOrNew(SchemaUtil.NAME_PROPERTIES).asObject();
-            ONode oRequired = target.getOrNew(SchemaUtil.NAME_REQUIRED).asArray();
+            ONode oProperties = target.getOrNew(SchemaKeywords.KEYWORD_PROPERTIES).asObject();
+            ONode oRequired = target.getOrNew(SchemaKeywords.KEYWORD_REQUIRED).asArray();
 
             ClassEggg classEggg = typeEggg.getClassEggg();
 
@@ -269,11 +270,11 @@ public class JsonSchemaGenerator {
 
                 if (propertyNode != null) {
                     if (Asserts.isNotEmpty(attr.getDescription())) {
-                        propertyNode.set(SchemaUtil.NAME_DESCRIPTION, attr.getDescription());
+                        propertyNode.set(SchemaKeywords.KEYWORD_DESCRIPTION, attr.getDescription());
                     }
 
                     if (Asserts.isNotEmpty(attr.getTitle())) {
-                        propertyNode.set(SchemaUtil.NAME_TITLE, attr.getTitle());
+                        propertyNode.set(SchemaKeywords.KEYWORD_TITLE, attr.getTitle());
                     }
 
                     if (attr.isFlat()) {
@@ -307,21 +308,21 @@ public class JsonSchemaGenerator {
 
     // 处理数组类型
     private ONode generateArrayToNode(TypeEggg typeEggg, ONode target) throws Throwable {
-        target.set(SchemaUtil.NAME_TYPE, SchemaUtil.TYPE_ARRAY);
+        target.set(SchemaKeywords.KEYWORD_TYPE, SchemaKeywords.TYPE_ARRAY);
 
         ONode itemsType = generateValueToNode(EgggUtil.getTypeEggg(typeEggg.getType().getComponentType()), null, new ONode());
-        target.set(SchemaUtil.NAME_ITEMS, itemsType);
+        target.set(SchemaKeywords.KEYWORD_ITEMS, itemsType);
 
         return target;
     }
 
     // 处理集合类型
     private ONode generateCollectionToNode(TypeEggg typeEggg, ONode target) throws Throwable {
-        target.set(SchemaUtil.NAME_TYPE, SchemaUtil.TYPE_ARRAY);
+        target.set(SchemaKeywords.KEYWORD_TYPE, SchemaKeywords.TYPE_ARRAY);
 
         if (typeEggg.isParameterizedType()) {
             ONode itemsType = generateValueToNode(EgggUtil.getTypeEggg(typeEggg.getActualTypeArguments()[0]), null, new ONode());
-            target.set(SchemaUtil.NAME_ITEMS, itemsType);
+            target.set(SchemaKeywords.KEYWORD_ITEMS, itemsType);
         }
 
         return target;
@@ -329,7 +330,7 @@ public class JsonSchemaGenerator {
 
     // 处理Map类型
     private ONode generateMapToNode(TypeEggg typeEggg, ONode target) throws Throwable {
-        target.set(SchemaUtil.NAME_TYPE, SchemaUtil.TYPE_OBJECT);
+        target.set(SchemaKeywords.KEYWORD_TYPE, SchemaKeywords.TYPE_OBJECT);
 
         // 对于Map，可以添加additionalProperties来说明值类型
         if (typeEggg.isParameterizedType() && typeEggg.getActualTypeArguments().length > 1) {
@@ -337,12 +338,12 @@ public class JsonSchemaGenerator {
 
             if (valueEggg.getType() != Object.class) {
                 ONode valueSchema = generateValueToNode(valueEggg, null, new ONode());
-                target.set(SchemaUtil.NAME_ADDITIONAL_PROPERTIES, valueSchema);
+                target.set(SchemaKeywords.KEYWORD_ADDITIONAL_PROPERTIES, valueSchema);
             } else {
-                target.set(SchemaUtil.NAME_ADDITIONAL_PROPERTIES, true);
+                target.set(SchemaKeywords.KEYWORD_ADDITIONAL_PROPERTIES, true);
             }
         } else {
-            target.set(SchemaUtil.NAME_ADDITIONAL_PROPERTIES, true);
+            target.set(SchemaKeywords.KEYWORD_ADDITIONAL_PROPERTIES, true);
         }
 
         return target;

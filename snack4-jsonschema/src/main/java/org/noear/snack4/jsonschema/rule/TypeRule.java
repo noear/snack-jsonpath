@@ -18,8 +18,9 @@ package org.noear.snack4.jsonschema.rule;
 import org.noear.snack4.ONode;
 import org.noear.snack4.jsonschema.JsonSchemaException;
 import org.noear.snack4.jsonschema.PathTracker;
-import org.noear.snack4.jsonschema.generate.SchemaUtil;
+import org.noear.snack4.jsonschema.SchemaKeywords;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -45,15 +46,15 @@ public class TypeRule implements ValidationRule {
             }
         }
 
-        if (allowedTypes.contains(SchemaUtil.TYPE_NUMBER)) {
+        if (allowedTypes.contains(SchemaKeywords.TYPE_NUMBER)) {
             //数字也支持整型
-            allowedTypes.add(SchemaUtil.TYPE_INTEGER);
+            allowedTypes.add(SchemaKeywords.TYPE_INTEGER);
         }
     }
 
     @Override
     public void validate(ONode data, PathTracker path) throws JsonSchemaException {
-        String actualType = SchemaUtil.getSchemaTypeName(data);
+        String actualType = getSchemaTypeName(data);
 
         if (!allowedTypes.contains(actualType)) {
             throw new JsonSchemaException("Type mismatch. Expected: " + allowedTypes + ", Actual: " + actualType + " at " + path.currentPath());
@@ -65,5 +66,34 @@ public class TypeRule implements ValidationRule {
         return "TypeRule{" +
                 "allowedTypes=" + allowedTypes +
                 '}';
+    }
+
+    private static String getSchemaTypeName(ONode node) {
+        switch (node.type()) {
+            case Undefined:
+                return "undefined";
+            case Null:
+                return "null";
+            case Boolean:
+                return "boolean";
+            case Number:
+                if (node.getValue() instanceof Float ||
+                        node.getValue() instanceof Double ||
+                        node.getValue() instanceof BigDecimal) {
+                    return "number";
+                } else {
+                    return "integer";
+                }
+            case String:
+                return "string";
+            case Date:
+                return "date";
+            case Array:
+                return "array";
+            case Object:
+                return "object";
+            default:
+                return "unknown";
+        }
     }
 }

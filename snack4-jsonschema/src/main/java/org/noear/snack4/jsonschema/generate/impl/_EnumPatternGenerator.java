@@ -18,7 +18,7 @@ package org.noear.snack4.jsonschema.generate.impl;
 import org.noear.eggg.TypeEggg;
 import org.noear.snack4.ONode;
 import org.noear.snack4.annotation.ONodeAttrHolder;
-import org.noear.snack4.jsonschema.generate.SchemaUtil;
+import org.noear.snack4.jsonschema.SchemaKeywords;
 import org.noear.snack4.jsonschema.generate.TypePatternGenerator;
 
 /**
@@ -34,9 +34,9 @@ public class _EnumPatternGenerator implements TypePatternGenerator {
 
     @Override
     public ONode generate(ONodeAttrHolder att, TypeEggg typeEggg, ONode target) {
-        target.set(SchemaUtil.NAME_TYPE, SchemaUtil.TYPE_STRING);
+        target.set(SchemaKeywords.KEYWORD_TYPE, SchemaKeywords.TYPE_STRING);
 
-        target.getOrNew(SchemaUtil.NAME_ENUM).then(n -> {
+        target.getOrNew(SchemaKeywords.KEYWORD_ENUM).then(n -> {
             for (Object e : typeEggg.getType().getEnumConstants()) {
                 n.add(e.toString());
             }

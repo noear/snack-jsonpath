@@ -18,7 +18,7 @@ package org.noear.snack4.jsonschema.generate.impl;
 import org.noear.eggg.TypeEggg;
 import org.noear.snack4.ONode;
 import org.noear.snack4.annotation.ONodeAttrHolder;
-import org.noear.snack4.jsonschema.generate.SchemaUtil;
+import org.noear.snack4.jsonschema.SchemaKeywords;
 import org.noear.snack4.jsonschema.generate.TypeGenerator;
 
 /**
@@ -36,7 +36,7 @@ public class CharGenerator implements TypeGenerator {
 
     @Override
     public ONode generate(ONodeAttrHolder att, TypeEggg typeEggg, ONode target) {
-        return target.set(SchemaUtil.NAME_TYPE, SchemaUtil.TYPE_STRING)
+        return target.set(SchemaKeywords.KEYWORD_TYPE, SchemaKeywords.TYPE_STRING)
                 .set("maxLength", 1)
                 .set("minLength", 1);
     }
