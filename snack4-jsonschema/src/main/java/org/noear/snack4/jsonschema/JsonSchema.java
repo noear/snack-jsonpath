@@ -302,13 +302,12 @@ public class JsonSchema {
                 compileSchemaRecursive(referencedSchema, rules, path);
                 return; // 已经处理完引用，跳过后续的规则提取
             } else {
-                // 抛出异常或记录警告
-                throw new JsonSchemaException("Could not resolve $ref: " + refPath);
+                // $ref 解析失败时，提供详细的路径信息
+                throw new JsonSchemaException("Could not resolve $ref: " + refPath, path.currentPath(), refPath);
             }
         }
 
-        // allOf 中的所有规则都必须满足，它们可以被“拍平”合并到当前路径的规则列表中。
-        // 这避免了在运行时（validateNode）再去处理 allOf，提高了性能。
+        // allOf 中的所有规则都必须满足
         if (schemaNode.hasKey("allOf")) {
             for (ONode subSchema : schemaNode.get("allOf").getArray()) {
                 // 关键：使用 *相同的路径* 递归编译
@@ -344,7 +343,7 @@ public class JsonSchema {
         }
         // 额外属性规则
         if (schemaNode.hasKey("additionalProperties")) {
-            localRules.add(new AdditionalPropertiesRule(schemaNode, this.schema));
+            localRules.add(new AdditionalPropertiesRule(schemaNode));
         }
 
         if (!localRules.isEmpty()) {
@@ -364,6 +363,17 @@ public class JsonSchema {
                 path.enterProperty(kv.getKey());
                 compileSchemaRecursive(kv.getValue(), rules, path);
                 path.exit();
+            }
+        }
+
+        // 递归处理 patternProperties
+        if (schemaNode.hasKey("patternProperties")) {
+            ONode patternsNode = schemaNode.get("patternProperties");
+            for (Map.Entry<String, ONode> kv : patternsNode.getObject().entrySet()) {
+                // 编译规则，但不需要 enterProperty，因为它们是通用的模式。
+                // 路径依然是当前路径，但规则将被用于所有匹配的属性。
+                // 实际验证发生在 AdditionalPropertiesRule 中。这里只做规则编译。
+                compileSchemaRecursive(kv.getValue(), rules, path);
             }
         }
 
