@@ -27,15 +27,36 @@ public interface SchemaKeywords {
     String KEYWORD_DESCRIPTION = "description";
     String KEYWORD_FORMAT = "format";
     String KEYWORD_REQUIRED = "required";
-    String KEYWORD_ITEMS = "items";
     String KEYWORD_ENUM = "enum";
+
     String KEYWORD_PROPERTIES = "properties";
     String KEYWORD_ADDITIONAL_PROPERTIES = "additionalProperties";
+    String KEYWORD_PATTERN_PROPERTIES = "patternProperties";
+
+
+    String KEYWORD_MIN_LENGTH = "minLength";
+    String KEYWORD_MAX_LENGTH = "maxLength";
+    String KEYWORD_PATTERN = "pattern";
+
+
+    String KEYWORD_MINIMUM = "minimum";
+    String KEYWORD_MAXIMUM = "maximum";
+    String KEYWORD_EXCLUSIVE_MAXIMUM = "exclusiveMaximum";
+    String KEYWORD_EXCLUSIVE_MINIMUM = "exclusiveMinimum";
+
+    String KEYWORD_ITEMS = "items";
+    String KEYWORD_MIN_ITEMS = "minItems";
+    String KEYWORD_MAX_ITEMS = "maxItems";
+
+    String KEYWORD_ALLOF = "allOf";
+    String KEYWORD_ANYOF = "anyOf";
+    String KEYWORD_ONEOF = "oneOf";
 
     String KEYWORD_REF = "$ref";
     String KEYWORD_SCHEMA = "$schema";
     String KEYWORD_DEFS = "$defs";
     String KEYWORD_DEFINITIONS = "definitions";
+
 
     String FORMAT_URI = "uri";
     String FORMAT_DATE_TIME = "date-time";
