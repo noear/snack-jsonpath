@@ -1,3 +1,18 @@
+/*
+ * Copyright 2005-2025 noear.org and authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.noear.snack4.jsonschema.rule;
 
 import org.noear.snack4.ONode;
@@ -5,7 +20,6 @@ import org.noear.snack4.jsonschema.JsonSchemaException;
 import org.noear.snack4.jsonschema.PathTracker;
 import org.noear.snack4.jsonschema.SchemaKeyword;
 import org.noear.snack4.jsonschema.SchemaType;
-import org.noear.snack4.util.Asserts;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,31 +37,36 @@ public class PropertyNamesRule implements ValidationRule {
     private final ONode propertyNamesSchema;
     private final String expectedType;
 
-    public PropertyNamesRule(ONode schemaNode) {
-        propertyNamesSchema = schemaNode.get(SchemaKeyword.PROPERTY_NAMES);
-        expectedType = getExpectedType();
+    private final boolean hasStringConstraints;
+    private final boolean hasNumericConstraints;
 
-        // 1. 类型规则（通常是 type: string）
+    public PropertyNamesRule(ONode schemaNode) {
+        this.propertyNamesSchema = schemaNode.get(SchemaKeyword.PROPERTY_NAMES);
+        this.expectedType = getExpectedType();
+
+        // 预计算约束存在性
+        this.hasStringConstraints = propertyNamesSchema.hasKey(SchemaKeyword.MIN_LENGTH) ||
+                propertyNamesSchema.hasKey(SchemaKeyword.MAX_LENGTH) ||
+                propertyNamesSchema.hasKey(SchemaKeyword.PATTERN) ||
+                propertyNamesSchema.hasKey(SchemaKeyword.FORMAT);
+
+        this.hasNumericConstraints = propertyNamesSchema.hasKey(SchemaKeyword.MINIMUM) ||
+                propertyNamesSchema.hasKey(SchemaKeyword.MAXIMUM) ||
+                propertyNamesSchema.hasKey(SchemaKeyword.EXCLUSIVE_MINIMUM) ||
+                propertyNamesSchema.hasKey(SchemaKeyword.EXCLUSIVE_MAXIMUM);
+
+        // 1. 类型规则
         if (propertyNamesSchema.hasKey(SchemaKeyword.TYPE)) {
             compiledNameRules.add(new TypeRule(propertyNamesSchema.get(SchemaKeyword.TYPE)));
         }
 
-        // 2. 字符串约束规则（minLength, maxLength, pattern, format）
-        if (propertyNamesSchema.hasKey(SchemaKeyword.MIN_LENGTH) ||
-                propertyNamesSchema.hasKey(SchemaKeyword.MAX_LENGTH) ||
-                propertyNamesSchema.hasKey(SchemaKeyword.PATTERN) ||
-                propertyNamesSchema.hasKey(SchemaKeyword.FORMAT)) {
-
-            // 依赖于 StringConstraintRule 已经支持 format 的前提
+        // 2. 字符串约束规则
+        if (hasStringConstraints) {
             compiledNameRules.add(new StringConstraintRule(propertyNamesSchema));
         }
 
-        // 3. 数值约束规则（minimum, maximum, exclusiveMinimum, exclusiveMaximum）
-        if (propertyNamesSchema.hasKey(SchemaKeyword.MINIMUM) ||
-                propertyNamesSchema.hasKey(SchemaKeyword.MAXIMUM) ||
-                propertyNamesSchema.hasKey(SchemaKeyword.EXCLUSIVE_MINIMUM) ||
-                propertyNamesSchema.hasKey(SchemaKeyword.EXCLUSIVE_MAXIMUM)) {
-
+        // 3. 数值约束规则
+        if (hasNumericConstraints) {
             compiledNameRules.add(new NumericConstraintRule(propertyNamesSchema));
         }
 
@@ -70,21 +89,17 @@ public class PropertyNamesRule implements ValidationRule {
 
         // 迭代对象的所有键名
         for (String propName : data.getObject().keySet()) {
-            // 将属性名称包装成一个 String ONode，以便可以对其应用 ValidationRule
+            // 将属性名称包装成一个 ONode
             ONode nameNode = createNameNode(propName);
 
             // 当前路径（仅用于错误提示，不用于递归进入）
             String currentPath = path.currentPath();
 
             try {
-                // 对所有编译好的属性名规则进行验证
                 for (ValidationRule rule : compiledNameRules) {
-                    // 对键名进行验证
                     rule.validate(nameNode, path);
                 }
             } catch (JsonSchemaException e) {
-                // 如果任何键名验证失败，抛出新的异常，提供详细的上下文
-                // 关键是提供是哪个属性名失败了
                 throw new JsonSchemaException(
                         "Property name '" + propName + "' failed validation. " + e.getMessage(),
                         currentPath,
@@ -95,7 +110,7 @@ public class PropertyNamesRule implements ValidationRule {
     }
 
     /**
-     * 获取 propertyNames 中期望的类型
+     * 获取 propertyNames 中期望的类型（单字符串类型）
      */
     private String getExpectedType() {
         if (propertyNamesSchema.hasKey(SchemaKeyword.TYPE)) {
@@ -104,46 +119,35 @@ public class PropertyNamesRule implements ValidationRule {
                 return typeNode.getString();
             }
         }
-
-        return null; // 没有明确的类型约束
+        return null;
     }
 
-    /**
-     * 根据属性名字符串创建对应的 ONode
-     * 如果属性名是数字字符串，创建为数字节点，否则创建为字符串节点
-     */
     private ONode createNameNode(String propName) {
-        // 如果有明确的类型约束，按照约束创建节点
-        if (SchemaType.INTEGER.equals(expectedType)) {
-            // 期望 integer 类型，尝试转换为数字
-            if (Asserts.isInteger(propName)) {
-                try {
-                    long value = Long.parseLong(propName);
-                    return ONode.ofBean(value);
-                } catch (NumberFormatException e) {
-                    // 转换失败，保持字符串
+        if (SchemaType.INTEGER.equals(expectedType) || SchemaType.NUMBER.equals(expectedType)) {
+            try {
+                // 尝试解析为 Double
+                double value = Double.parseDouble(propName);
+
+                // 如果期望是 integer，但值是小数，我们不能将其视为有效的数字键。
+                if (SchemaType.INTEGER.equals(expectedType) && value != Math.floor(value)) {
+                    // 此时，返回字符串节点。后续的 TypeRule (期望 integer) 会失败。
                     return ONode.ofBean(propName);
                 }
-            } else {
-                // 不是整数字符串，保持字符串让类型验证失败
-                return ONode.ofBean(propName);
-            }
-        } else if (SchemaType.NUMBER.equals(expectedType)) {
-            // 期望 number 类型，尝试转换为数字
-            if (Asserts.isNumber(propName)) {
-                try {
-                    double value = Double.parseDouble(propName);
+
+                // 成功解析为数字 (或整数)。
+                // 优化：对于整数值，尽量使用 Long 类型以避免精度问题，且与 TypeRule 兼容性更好。
+                if (value == Math.floor(value)) {
+                    return ONode.ofBean((long) value);
+                } else {
                     return ONode.ofBean(value);
-                } catch (NumberFormatException e) {
-                    // 转换失败，保持字符串
-                    return ONode.ofBean(propName);
                 }
-            } else {
-                // 不是数字字符串，保持字符串让类型验证失败
+            } catch (NumberFormatException e) {
+                // 键名不是有效的数字 (e.g., "abc")，保持为字符串节点。
+                // TypeRule 会捕获类型不匹配。
                 return ONode.ofBean(propName);
             }
         } else {
-            // 期望 string 类型或其他类型，或者没有类型约束，保持为字符串
+            // 期望 string, object, array, null 或无约束，一律创建为字符串节点
             return ONode.ofBean(propName);
         }
     }
