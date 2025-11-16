@@ -382,8 +382,7 @@ public class JsonSchema {
             return null;
         }
 
-        // 优化点 7: 健壮的 $ref 解析 (JSON Pointer)
-        // 移除 "#/" 前缀
+        // 健壮的 $ref 解析 (JSON Pointer)。移除 "#/" 前缀
         String[] parts = refPath.substring(2).split("/");
         ONode current = this.schema; // 始终从根 schema 开始解析
 
