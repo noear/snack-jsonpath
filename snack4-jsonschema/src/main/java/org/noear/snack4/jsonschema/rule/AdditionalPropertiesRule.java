@@ -37,7 +37,7 @@ public class AdditionalPropertiesRule implements ValidationRule {
 
     public AdditionalPropertiesRule(ONode schemaNode) {
         ONode additionalPropsNode = schemaNode.get("additionalProperties");
-        ONode patternPropertiesNode = schemaNode.get("patternProperties");
+        ONode patternPropertiesNode = schemaNode.getOrNull("patternProperties");
 
         if (additionalPropsNode.isBoolean()) {
             this.allowAdditional = additionalPropsNode.getBoolean();
@@ -67,7 +67,9 @@ public class AdditionalPropertiesRule implements ValidationRule {
         }
     }
 
-    /** 检查属性是否通过 patternProperties 定义 */
+    /**
+     * 检查属性是否通过 patternProperties 定义
+     */
     private boolean isPatternDefined(String propertyName) {
         for (Pattern pattern : compiledPatterns.values()) {
             if (pattern.matcher(propertyName).matches()) {
