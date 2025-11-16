@@ -100,12 +100,12 @@ public class JsonSchema {
         }
 
         // 2. 处理对象属性校验
-        if (dataNode.isObject() && schemaNode.hasKey(SchemaKeywords.KEYWORD_PROPERTIES)) {
+        if (dataNode.isObject() && schemaNode.hasKey(SchemaKeyword.PROPERTIES)) {
             validateProperties(schemaNode, dataNode, path);
         }
 
         // 3. 处理数组项校验
-        if (dataNode.isArray() && schemaNode.hasKey(SchemaKeywords.KEYWORD_ITEMS)) {
+        if (dataNode.isArray() && schemaNode.hasKey(SchemaKeyword.ITEMS)) {
             validateArrayItems(schemaNode, dataNode, path);
         }
 
@@ -114,7 +114,7 @@ public class JsonSchema {
     }
 
     private void validateArrayItems(ONode schemaNode, ONode dataNode, PathTracker path) throws JsonSchemaException {
-        ONode itemsSchema = schemaNode.get(SchemaKeywords.KEYWORD_ITEMS);
+        ONode itemsSchema = schemaNode.get(SchemaKeyword.ITEMS);
 
         List<ONode> items = dataNode.getArray();
         String wildcardPath = path.currentPath() + "[*]";
@@ -131,7 +131,7 @@ public class JsonSchema {
 
     // 对象属性校验
     private void validateProperties(ONode schemaNode, ONode dataNode, PathTracker path) throws JsonSchemaException {
-        ONode propertiesNode = schemaNode.get(SchemaKeywords.KEYWORD_PROPERTIES);
+        ONode propertiesNode = schemaNode.get(SchemaKeyword.PROPERTIES);
 
         Map<String, ONode> properties = propertiesNode.getObject();
         Map<String, ONode> dataObj = dataNode.getObject();
@@ -150,8 +150,8 @@ public class JsonSchema {
     // 条件校验
     private void validateConditional(ONode schemaNode, ONode dataNode, PathTracker path) throws JsonSchemaException {
         // allOf 的规则已经在编译时合并。只需要处理 anyOf 和 oneOf
-        validateConditionalGroup(schemaNode, SchemaKeywords.KEYWORD_ANYOF, dataNode, path);
-        validateConditionalGroup(schemaNode, SchemaKeywords.KEYWORD_ONEOF, dataNode, path);
+        validateConditionalGroup(schemaNode, SchemaKeyword.ANYOF, dataNode, path);
+        validateConditionalGroup(schemaNode, SchemaKeyword.ONEOF, dataNode, path);
     }
 
     private void validateConditionalGroup(ONode schemaNode, String key,
@@ -180,11 +180,11 @@ public class JsonSchema {
             }
         }
 
-        if (key.equals(SchemaKeywords.KEYWORD_ANYOF) && matchCount == 0) {
+        if (key.equals(SchemaKeyword.ANYOF) && matchCount == 0) {
             throw new JsonSchemaException("Failed to satisfy anyOf constraints at " + path.currentPath() + ". Errors: " + errorMessages);
         }
 
-        if (key.equals(SchemaKeywords.KEYWORD_ONEOF) && matchCount != 1) {
+        if (key.equals(SchemaKeyword.ONEOF) && matchCount != 1) {
             throw new JsonSchemaException("Must satisfy exactly one of oneOf constraints (found " + matchCount + ") at " + path.currentPath() + ". Errors: " + errorMessages);
         }
     }
@@ -210,24 +210,24 @@ public class JsonSchema {
         }
 
         // 2. 处理对象属性校验
-        if (dataNode.isObject() && schemaNode.hasKey(SchemaKeywords.KEYWORD_PROPERTIES)) {
+        if (dataNode.isObject() && schemaNode.hasKey(SchemaKeyword.PROPERTIES)) {
             validatePropertiesWithRules(schemaNode, dataNode, path, rules);
         }
 
         // 3. 处理数组项校验
-        if (dataNode.isArray() && schemaNode.hasKey(SchemaKeywords.KEYWORD_ITEMS)) {
+        if (dataNode.isArray() && schemaNode.hasKey(SchemaKeyword.ITEMS)) {
             validateArrayItemsWithRules(schemaNode, dataNode, path, rules);
         }
 
         // 4. 递归处理条件（anyOf/oneOf）
         // (注意：allOf 应该在 compileSchemaFragment 时被合并，这里只处理 anyOf/oneOf)
-        validateConditionalWithRules(schemaNode, SchemaKeywords.KEYWORD_ANYOF, dataNode, path, rules);
-        validateConditionalWithRules(schemaNode, SchemaKeywords.KEYWORD_ONEOF, dataNode, path, rules);
+        validateConditionalWithRules(schemaNode, SchemaKeyword.ANYOF, dataNode, path, rules);
+        validateConditionalWithRules(schemaNode, SchemaKeyword.ONEOF, dataNode, path, rules);
     }
 
     // 针对 "WithRules" 版本的递归辅助方法
     private void validatePropertiesWithRules(ONode schemaNode, ONode dataNode, PathTracker path, Map<String, CompiledRule> rules) throws JsonSchemaException {
-        ONode propertiesNode = schemaNode.get(SchemaKeywords.KEYWORD_PROPERTIES);
+        ONode propertiesNode = schemaNode.get(SchemaKeyword.PROPERTIES);
         Map<String, ONode> properties = propertiesNode.getObject();
         Map<String, ONode> dataObj = dataNode.getObject();
 
@@ -243,7 +243,7 @@ public class JsonSchema {
 
     // 针对 "WithRules" 版本的递归辅助方法
     private void validateArrayItemsWithRules(ONode schemaNode, ONode dataNode, PathTracker path, Map<String, CompiledRule> rules) throws JsonSchemaException {
-        ONode itemsSchema = schemaNode.get(SchemaKeywords.KEYWORD_ITEMS);
+        ONode itemsSchema = schemaNode.get(SchemaKeyword.ITEMS);
         List<ONode> items = dataNode.getArray();
         for (int i = 0; i < items.size(); i++) {
             path.enterIndex(i);
@@ -277,10 +277,10 @@ public class JsonSchema {
         }
 
         // 校验逻辑 (同 validateConditionalGroup)
-        if (key.equals(SchemaKeywords.KEYWORD_ANYOF) && matchCount == 0) {
+        if (key.equals(SchemaKeyword.ANYOF) && matchCount == 0) {
             throw new JsonSchemaException("Failed to satisfy anyOf constraints at " + path.currentPath() + ". Errors: " + errorMessages);
         }
-        if (key.equals(SchemaKeywords.KEYWORD_ONEOF) && matchCount != 1) {
+        if (key.equals(SchemaKeyword.ONEOF) && matchCount != 1) {
             throw new JsonSchemaException("Must satisfy exactly one of oneOf constraints (found " + matchCount + ") at " + path.currentPath() + ". Errors: " + errorMessages);
         }
     }
@@ -294,8 +294,8 @@ public class JsonSchema {
     }
 
     private void compileSchemaRecursive(ONode schemaNode, Map<String, CompiledRule> rules, PathTracker path) {
-        if (schemaNode.hasKey(SchemaKeywords.KEYWORD_REF)) {
-            String refPath = schemaNode.get(SchemaKeywords.KEYWORD_REF).getString();
+        if (schemaNode.hasKey(SchemaKeyword.REF)) {
+            String refPath = schemaNode.get(SchemaKeyword.REF).getString();
             ONode referencedSchema = resolveRef(refPath);
             if (referencedSchema != null) {
                 // 解析 $ref，并 *在当前路径* 编译引用的内容
@@ -308,8 +308,8 @@ public class JsonSchema {
         }
 
         // allOf 中的所有规则都必须满足
-        if (schemaNode.hasKey(SchemaKeywords.KEYWORD_ALLOF)) {
-            for (ONode subSchema : schemaNode.get(SchemaKeywords.KEYWORD_ALLOF).getArray()) {
+        if (schemaNode.hasKey(SchemaKeyword.ALLOF)) {
+            for (ONode subSchema : schemaNode.get(SchemaKeyword.ALLOF).getArray()) {
                 // 关键：使用 *相同的路径* 递归编译
                 compileSchemaRecursive(subSchema, rules, path);
             }
@@ -318,33 +318,33 @@ public class JsonSchema {
         List<ValidationRule> localRules = new ArrayList<>();
 
         // 类型规则
-        if (schemaNode.hasKey(SchemaKeywords.KEYWORD_TYPE)) {
-            localRules.add(new TypeRule(schemaNode.get(SchemaKeywords.KEYWORD_TYPE)));
+        if (schemaNode.hasKey(SchemaKeyword.TYPE)) {
+            localRules.add(new TypeRule(schemaNode.get(SchemaKeyword.TYPE)));
         }
         // 枚举规则
-        if (schemaNode.hasKey(SchemaKeywords.KEYWORD_ENUM)) {
-            localRules.add(new EnumRule(schemaNode.get(SchemaKeywords.KEYWORD_ENUM)));
+        if (schemaNode.hasKey(SchemaKeyword.ENUM)) {
+            localRules.add(new EnumRule(schemaNode.get(SchemaKeyword.ENUM)));
         }
         // 必需字段规则
-        if (schemaNode.hasKey(SchemaKeywords.KEYWORD_REQUIRED)) {
-            localRules.add(new RequiredRule(schemaNode.get(SchemaKeywords.KEYWORD_REQUIRED)));
+        if (schemaNode.hasKey(SchemaKeyword.REQUIRED)) {
+            localRules.add(new RequiredRule(schemaNode.get(SchemaKeyword.REQUIRED)));
         }
         // 字符串约束规则
-        if (schemaNode.hasKey(SchemaKeywords.KEYWORD_MIN_LENGTH) || schemaNode.hasKey(SchemaKeywords.KEYWORD_MAX_LENGTH) ||
-                schemaNode.hasKey(SchemaKeywords.KEYWORD_PATTERN)) {
+        if (schemaNode.hasKey(SchemaKeyword.MIN_LENGTH) || schemaNode.hasKey(SchemaKeyword.MAX_LENGTH) ||
+                schemaNode.hasKey(SchemaKeyword.PATTERN)) {
             localRules.add(new StringConstraintRule(schemaNode));
         }
         // 数值约束规则
-        if (schemaNode.hasKey(SchemaKeywords.KEYWORD_MINIMUM) || schemaNode.hasKey(SchemaKeywords.KEYWORD_MAXIMUM) ||
-                schemaNode.hasKey(SchemaKeywords.KEYWORD_EXCLUSIVE_MINIMUM) || schemaNode.hasKey(SchemaKeywords.KEYWORD_EXCLUSIVE_MAXIMUM)) {
+        if (schemaNode.hasKey(SchemaKeyword.MINIMUM) || schemaNode.hasKey(SchemaKeyword.MAXIMUM) ||
+                schemaNode.hasKey(SchemaKeyword.EXCLUSIVE_MINIMUM) || schemaNode.hasKey(SchemaKeyword.EXCLUSIVE_MAXIMUM)) {
             localRules.add(new NumericConstraintRule(schemaNode));
         }
         // 数组约束规则
-        if (schemaNode.hasKey(SchemaKeywords.KEYWORD_MIN_ITEMS) || schemaNode.hasKey(SchemaKeywords.KEYWORD_MAX_ITEMS)) {
+        if (schemaNode.hasKey(SchemaKeyword.MIN_ITEMS) || schemaNode.hasKey(SchemaKeyword.MAX_ITEMS)) {
             localRules.add(new ArrayConstraintRule(schemaNode));
         }
         // 额外属性规则
-        if (schemaNode.hasKey(SchemaKeywords.KEYWORD_ADDITIONAL_PROPERTIES)) {
+        if (schemaNode.hasKey(SchemaKeyword.ADDITIONAL_PROPERTIES)) {
             localRules.add(new AdditionalPropertiesRule(schemaNode));
         }
 
@@ -359,8 +359,8 @@ public class JsonSchema {
         }
 
         // 递归处理对象属性
-        if (schemaNode.hasKey(SchemaKeywords.KEYWORD_PROPERTIES)) {
-            ONode propsNode = schemaNode.get(SchemaKeywords.KEYWORD_PROPERTIES);
+        if (schemaNode.hasKey(SchemaKeyword.PROPERTIES)) {
+            ONode propsNode = schemaNode.get(SchemaKeyword.PROPERTIES);
             for (Map.Entry<String, ONode> kv : propsNode.getObject().entrySet()) {
                 path.enterProperty(kv.getKey());
                 compileSchemaRecursive(kv.getValue(), rules, path);
@@ -369,8 +369,8 @@ public class JsonSchema {
         }
 
         // 递归处理 patternProperties
-        if (schemaNode.hasKey(SchemaKeywords.KEYWORD_PATTERN_PROPERTIES)) {
-            ONode patternsNode = schemaNode.get(SchemaKeywords.KEYWORD_PATTERN_PROPERTIES);
+        if (schemaNode.hasKey(SchemaKeyword.PATTERN_PROPERTIES)) {
+            ONode patternsNode = schemaNode.get(SchemaKeyword.PATTERN_PROPERTIES);
             for (Map.Entry<String, ONode> kv : patternsNode.getObject().entrySet()) {
                 // 编译规则，但不需要 enterProperty，因为它们是通用的模式。
                 // 路径依然是当前路径，但规则将被用于所有匹配的属性。
@@ -380,8 +380,8 @@ public class JsonSchema {
         }
 
         // 递归处理数组项
-        if (schemaNode.hasKey(SchemaKeywords.KEYWORD_ITEMS)) {
-            ONode itemsSchema = schemaNode.get(SchemaKeywords.KEYWORD_ITEMS);
+        if (schemaNode.hasKey(SchemaKeyword.ITEMS)) {
+            ONode itemsSchema = schemaNode.get(SchemaKeyword.ITEMS);
             // 为通用 items 路径编译规则（用于没有特定索引的情况）
             String itemsPath = path.currentPath() + "[*]";
             compileSchemaRecursive(itemsSchema, rules, new PathTracker(itemsPath));

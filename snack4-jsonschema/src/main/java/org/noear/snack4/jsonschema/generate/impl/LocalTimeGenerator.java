@@ -18,7 +18,9 @@ package org.noear.snack4.jsonschema.generate.impl;
 import org.noear.eggg.TypeEggg;
 import org.noear.snack4.ONode;
 import org.noear.snack4.annotation.ONodeAttrHolder;
-import org.noear.snack4.jsonschema.SchemaKeywords;
+import org.noear.snack4.jsonschema.SchemaFormat;
+import org.noear.snack4.jsonschema.SchemaKeyword;
+import org.noear.snack4.jsonschema.SchemaType;
 import org.noear.snack4.jsonschema.generate.TypeGenerator;
 
 import java.time.LocalTime;
@@ -31,7 +33,7 @@ import java.time.LocalTime;
 public class LocalTimeGenerator implements TypeGenerator<LocalTime> {
     @Override
     public ONode generate(ONodeAttrHolder att, TypeEggg typeEggg, ONode target) {
-        return target.set(SchemaKeywords.KEYWORD_TYPE, SchemaKeywords.TYPE_STRING)
-                .set(SchemaKeywords.KEYWORD_FORMAT, SchemaKeywords.FORMAT_TIME);
+        return target.set(SchemaKeyword.TYPE, SchemaType.STRING)
+                .set(SchemaKeyword.FORMAT, SchemaFormat.TIME);
     }
 }

@@ -13,23 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.noear.snack4.jsonschema.generate.impl;
-
-import org.noear.eggg.TypeEggg;
-import org.noear.snack4.ONode;
-import org.noear.snack4.annotation.ONodeAttrHolder;
-import org.noear.snack4.jsonschema.SchemaKeyword;
-import org.noear.snack4.jsonschema.SchemaType;
-import org.noear.snack4.jsonschema.generate.TypeGenerator;
+package org.noear.snack4.jsonschema;
 
 /**
+ * 架构格式
  *
- * @author noear 2025/11/14 created
+ * @author noear 2025/11/16 created
  * @since 4.0
  */
-public class StringGenerator implements TypeGenerator<String> {
-    @Override
-    public ONode generate(ONodeAttrHolder att, TypeEggg typeEggg, ONode target) {
-        return target.set(SchemaKeyword.TYPE, SchemaType.STRING);
-    }
+public interface SchemaFormat {
+    String URI = "uri";
+    String DATE_TIME = "date-time";
+    String DATE = "date";
+    String TIME = "time";
 }

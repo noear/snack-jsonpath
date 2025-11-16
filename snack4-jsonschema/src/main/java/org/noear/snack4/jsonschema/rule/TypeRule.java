@@ -18,7 +18,7 @@ package org.noear.snack4.jsonschema.rule;
 import org.noear.snack4.ONode;
 import org.noear.snack4.jsonschema.JsonSchemaException;
 import org.noear.snack4.jsonschema.PathTracker;
-import org.noear.snack4.jsonschema.SchemaKeywords;
+import org.noear.snack4.jsonschema.SchemaType;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
@@ -46,9 +46,9 @@ public class TypeRule implements ValidationRule {
             }
         }
 
-        if (allowedTypes.contains(SchemaKeywords.TYPE_NUMBER)) {
+        if (allowedTypes.contains(SchemaType.NUMBER)) {
             //数字也支持整型
-            allowedTypes.add(SchemaKeywords.TYPE_INTEGER);
+            allowedTypes.add(SchemaType.INTEGER);
         }
     }
 

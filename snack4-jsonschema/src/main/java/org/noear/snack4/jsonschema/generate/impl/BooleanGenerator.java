@@ -18,7 +18,8 @@ package org.noear.snack4.jsonschema.generate.impl;
 import org.noear.eggg.TypeEggg;
 import org.noear.snack4.ONode;
 import org.noear.snack4.annotation.ONodeAttrHolder;
-import org.noear.snack4.jsonschema.SchemaKeywords;
+import org.noear.snack4.jsonschema.SchemaKeyword;
+import org.noear.snack4.jsonschema.SchemaType;
 import org.noear.snack4.jsonschema.generate.TypeGenerator;
 
 /**
@@ -34,6 +35,6 @@ public class BooleanGenerator implements TypeGenerator {
 
     @Override
     public ONode generate(ONodeAttrHolder att, TypeEggg typeEggg, ONode target) {
-        return target.set(SchemaKeywords.KEYWORD_TYPE, SchemaKeywords.TYPE_BOOLEAN);
+        return target.set(SchemaKeyword.TYPE, SchemaType.BOOLEAN);
     }
 }
