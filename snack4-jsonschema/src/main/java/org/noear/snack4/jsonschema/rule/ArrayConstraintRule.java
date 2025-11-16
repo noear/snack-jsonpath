@@ -37,17 +37,17 @@ public class ArrayConstraintRule implements ValidationRule {
     @Override
     public void validate(ONode data, PathTracker path) throws JsonSchemaException {
         if (!data.isArray()) {
-            return; // 只验证数组类型
+            return;
         }
 
         int size = data.getArray().size();
+        String currentPath = path.currentPath();
 
         if (minItems != null && size < minItems) {
-            throw new JsonSchemaException("Array length " + size + " < minItems(" + minItems + ")");
+            throw new JsonSchemaException("Array length " + size + " < minItems(" + minItems + ") at " + currentPath);
         }
-
         if (maxItems != null && size > maxItems) {
-            throw new JsonSchemaException("Array length " + size + " > maxItems(" + maxItems + ")");
+            throw new JsonSchemaException("Array length " + size + " > maxItems(" + maxItems + ") at " + currentPath);
         }
     }
 }

@@ -44,7 +44,7 @@ public class EnumRule implements ValidationRule {
     @Override
     public void validate(ONode data, PathTracker path) throws JsonSchemaException {
         if (!allowedValues.contains(data)) {
-            throw new JsonSchemaException("Value not in enum list");
+            throw new JsonSchemaException("Value '" + data.toJson() + "' not in enum list " + allowedValues + " at " + path.currentPath());
         }
     }
 

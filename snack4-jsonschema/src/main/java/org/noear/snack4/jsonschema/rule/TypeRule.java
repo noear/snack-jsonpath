@@ -56,7 +56,7 @@ public class TypeRule implements ValidationRule {
         String actualType = SchemaUtil.getSchemaTypeName(data);
 
         if (!allowedTypes.contains(actualType)) {
-            throw new JsonSchemaException("Type mismatch. Expected: " + allowedTypes + ", Actual: " + actualType);
+            throw new JsonSchemaException("Type mismatch. Expected: " + allowedTypes + ", Actual: " + actualType + " at " + path.currentPath());
         }
     }
 

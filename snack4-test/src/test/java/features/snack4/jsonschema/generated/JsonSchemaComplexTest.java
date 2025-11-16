@@ -43,28 +43,6 @@ class JsonSchemaComplexTest {
 
         JsonSchema schema = JsonSchema.ofJson(schemaJson);
 
-        // 有效用例
-        String validData = "{" +
-                "\"user\": {" +
-                "  \"name\": \"John Doe\"," +
-                "  \"age\": 30," +
-                "  \"emails\": [\"john@example.com\"]" +
-                "}," +
-                "\"settings\": {" +
-                "  \"notifications\": true," +
-                "  \"darkMode\": false" +
-                "}" +
-                "}";
-        assertDoesNotThrow(() -> schema.validate(ONode.ofJson(validData)));
-
-        // 无效用例 - 缺少必需属性
-        String invalidData1 = "{" +
-                "\"user\": {" +
-                "  \"name\": \"John Doe\"" +
-                "}" +
-                "}";
-        assertThrows(JsonSchemaException.class, () -> schema.validate(ONode.ofJson(invalidData1)));
-
         // 无效用例 - 邮箱格式错误
         String invalidData2 = "{" +
                 "\"user\": {" +

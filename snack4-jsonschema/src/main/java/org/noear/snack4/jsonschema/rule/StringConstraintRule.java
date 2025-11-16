@@ -19,6 +19,8 @@ import org.noear.snack4.ONode;
 import org.noear.snack4.jsonschema.JsonSchemaException;
 import org.noear.snack4.jsonschema.PathTracker;
 
+import java.util.regex.Pattern;
+
 /**
  * 字符串约束验证规则
  *
@@ -28,32 +30,43 @@ import org.noear.snack4.jsonschema.PathTracker;
 public class StringConstraintRule implements ValidationRule {
     private final Integer minLength;
     private final Integer maxLength;
-    private final String pattern;
+    private final String patternString;
+
+    private final Pattern compiledPattern;
 
     public StringConstraintRule(ONode schemaNode) {
         this.minLength = schemaNode.hasKey("minLength") ? schemaNode.get("minLength").getInt() : null;
         this.maxLength = schemaNode.hasKey("maxLength") ? schemaNode.get("maxLength").getInt() : null;
-        this.pattern = schemaNode.hasKey("pattern") ? schemaNode.get("pattern").getString() : null;
+        this.patternString = schemaNode.hasKey("pattern") ? schemaNode.get("pattern").getString() : null;
+
+        // 预编译
+        if (this.patternString != null) {
+            this.compiledPattern = Pattern.compile(this.patternString);
+        } else {
+            this.compiledPattern = null;
+        }
     }
 
     @Override
     public void validate(ONode data, PathTracker path) throws JsonSchemaException {
         if (!data.isString()) {
-            return; // 只验证字符串类型
+            return;
         }
 
         String value = data.getString();
+        String currentPath = path.currentPath();
 
         if (minLength != null && value.length() < minLength) {
-            throw new JsonSchemaException("String length " + value.length() + " < minLength(" + minLength + ")");
+            throw new JsonSchemaException("String length " + value.length() + " < minLength(" + minLength + ") at " + currentPath);
         }
 
         if (maxLength != null && value.length() > maxLength) {
-            throw new JsonSchemaException("String length " + value.length() + " > maxLength(" + maxLength + ")");
+            throw new JsonSchemaException("String length " + value.length() + " > maxLength(" + maxLength + ") at " + currentPath);
         }
 
-        if (pattern != null && !value.matches(pattern)) {
-            throw new JsonSchemaException("String does not match pattern: " + pattern);
+        // 使用预编译的 Pattern
+        if (compiledPattern != null && !compiledPattern.matcher(value).matches()) {
+            throw new JsonSchemaException("String does not match pattern: " + patternString + " at " + currentPath);
         }
     }
 }

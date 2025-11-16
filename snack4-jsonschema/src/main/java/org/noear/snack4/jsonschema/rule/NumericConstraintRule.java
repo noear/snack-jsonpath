@@ -26,28 +26,42 @@ import org.noear.snack4.jsonschema.PathTracker;
  * @since 4.0
  */
 public class NumericConstraintRule implements ValidationRule {
+    // 优化点 11: 完整支持数值约束
+    // 原始代码只支持 minimum/maximum。
+    // 增加了 exclusiveMinimum 和 exclusiveMaximum 的支持。
     private final Double minimum;
     private final Double maximum;
+    private final Double exclusiveMinimum;
+    private final Double exclusiveMaximum;
+
 
     public NumericConstraintRule(ONode schemaNode) {
         this.minimum = schemaNode.hasKey("minimum") ? schemaNode.get("minimum").getDouble() : null;
         this.maximum = schemaNode.hasKey("maximum") ? schemaNode.get("maximum").getDouble() : null;
+        this.exclusiveMinimum = schemaNode.hasKey("exclusiveMinimum") ? schemaNode.get("exclusiveMinimum").getDouble() : null;
+        this.exclusiveMaximum = schemaNode.hasKey("exclusiveMaximum") ? schemaNode.get("exclusiveMaximum").getDouble() : null;
     }
 
     @Override
     public void validate(ONode data, PathTracker path) throws JsonSchemaException {
         if (!data.isNumber()) {
-            return; // 只验证数字类型
+            return;
         }
 
         double value = data.getDouble();
+        String currentPath = path.currentPath();
 
         if (minimum != null && value < minimum) {
-            throw new JsonSchemaException("Value " + value + " < minimum(" + minimum + ")");
+            throw new JsonSchemaException("Value " + value + " < minimum(" + minimum + ") at " + currentPath);
         }
-
         if (maximum != null && value > maximum) {
-            throw new JsonSchemaException("Value " + value + " > maximum(" + maximum + ")");
+            throw new JsonSchemaException("Value " + value + " > maximum(" + maximum + ") at " + currentPath);
+        }
+        if (exclusiveMinimum != null && value <= exclusiveMinimum) {
+            throw new JsonSchemaException("Value " + value + " <= exclusiveMinimum(" + exclusiveMinimum + ") at " + currentPath);
+        }
+        if (exclusiveMaximum != null && value >= exclusiveMaximum) {
+            throw new JsonSchemaException("Value " + value + " >= exclusiveMaximum(" + exclusiveMaximum + ") at " + currentPath);
         }
     }
 }

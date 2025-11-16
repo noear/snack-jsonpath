@@ -25,42 +25,54 @@ import java.util.Deque;
  * @since 4.0
  */
 public class PathTracker {
-    private final Deque<String> stack = new ArrayDeque<>();
+    private final StringBuilder pathBuilder;
+    private String wildcardIndexPath;
+    private final Deque<Integer> lengthStack = new ArrayDeque<>();
 
     public PathTracker() {
-        stack.push("$");
+        this.pathBuilder = new StringBuilder("$");
+        this.lengthStack.push(pathBuilder.length());
     }
 
     public PathTracker(String rootPath) {
-        stack.push(rootPath);
+        this.pathBuilder = new StringBuilder(rootPath);
+        this.lengthStack.push(pathBuilder.length());
     }
 
     /** 进入对象属性 */
     public void enterProperty(String property) {
-        String current = stack.peek();
-        stack.push(current + "." + property);
+        pathBuilder.append('.').append(property);
+        lengthStack.push(pathBuilder.length());
     }
 
     /** 进入数组索引 */
     public void enterIndex(int arrayIndex) {
-        String current = stack.peek();
-        stack.push(current + "[" + arrayIndex + "]");
+        wildcardIndexPath = pathBuilder.toString()+"[*]";
+        pathBuilder.append('[').append(arrayIndex).append(']');
+        lengthStack.push(pathBuilder.length());
     }
 
     /** 获取当前路径 */
     public String currentPath() {
-        return stack.peek();
+        return pathBuilder.toString();
     }
 
     /** 退出当前层级 */
     public void exit() {
-        if (stack.size() > 1) {
-            stack.pop();
+        wildcardIndexPath = null;
+
+        if (lengthStack.size() > 1) {
+            lengthStack.pop(); // 弹出当前长度
+            pathBuilder.setLength(lengthStack.peek()); // 恢复到上一个长度
         }
     }
 
     /** 创建新实例 */
     public static PathTracker begin() {
         return new PathTracker();
+    }
+
+    public String getWildcardPath() {
+        return wildcardIndexPath;
     }
 }

@@ -33,6 +33,10 @@ public class CompiledRule {
         this.rules = rules;
     }
 
+    public void addRules(List<ValidationRule> newRules) {
+        this.rules.addAll(newRules);
+    }
+
     public void validate(ONode data, PathTracker path) throws JsonSchemaException {
         for (ValidationRule rule : rules) {
             rule.validate(data, path);

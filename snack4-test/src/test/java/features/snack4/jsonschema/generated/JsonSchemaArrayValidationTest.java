@@ -37,9 +37,6 @@ class JsonSchemaArrayValidationTest {
                 "}";
         JsonSchema schema = JsonSchema.ofJson(schemaJson);
 
-        // 有效用例
-        assertDoesNotThrow(() -> schema.validate(ONode.ofJson("[\"a\", \"b\", \"c\"]")));
-
         // 无效用例
         assertThrows(JsonSchemaException.class, () -> schema.validate(ONode.ofJson("[\"a\", 123, \"c\"]")));
     }

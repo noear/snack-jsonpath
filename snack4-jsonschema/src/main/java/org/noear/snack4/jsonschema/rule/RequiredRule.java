@@ -41,12 +41,14 @@ public class RequiredRule implements ValidationRule {
     @Override
     public void validate(ONode data, PathTracker path) throws JsonSchemaException {
         if (!data.isObject()) {
-            return; // 只验证对象类型
+            return;
         }
+
+        String currentPath = path.currentPath();
 
         for (String field : requiredFields) {
             if (!data.getObject().containsKey(field)) {
-                throw new JsonSchemaException("Missing required field: " + field);
+                throw new JsonSchemaException("Missing required field: " + field + " at " + currentPath);
             }
         }
     }
