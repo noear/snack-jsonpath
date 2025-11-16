@@ -300,7 +300,20 @@ public class JsonSchemaGenerator {
 
         // 对于Map，可以添加additionalProperties来说明值类型
         if (typeEggg.isParameterizedType() && typeEggg.getActualTypeArguments().length > 1) {
+            TypeEggg keyEggg = EgggUtil.getTypeEggg(typeEggg.getActualTypeArguments()[0]);
             TypeEggg valueEggg = EgggUtil.getTypeEggg(typeEggg.getActualTypeArguments()[1]);
+
+
+            if (keyEggg.getType() != Object.class && keyEggg.getType() != String.class) {
+                ONode keySchema = generateValueToNode(keyEggg, null, new ONode());
+
+                if (keySchema != null) {
+                    ONode propertyNamesSchema = new ONode().asObject();
+                    propertyNamesSchema.set(SchemaKeyword.TYPE, SchemaType.STRING);
+                    ONode propertyNamesInnerSchema = generateValueToNode(keyEggg, null, new ONode());
+                    target.set(SchemaKeyword.PROPERTY_NAMES, propertyNamesInnerSchema);
+                }
+            }
 
             if (valueEggg.getType() != Object.class) {
                 ONode valueSchema = generateValueToNode(valueEggg, null, new ONode());

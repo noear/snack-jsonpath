@@ -38,7 +38,7 @@ public class CharGenerator implements TypeGenerator {
     @Override
     public ONode generate(ONodeAttrHolder att, TypeEggg typeEggg, ONode target) {
         return target.set(SchemaKeyword.TYPE, SchemaType.STRING)
-                .set("maxLength", 1)
-                .set("minLength", 1);
+                .set(SchemaKeyword.MAX_LENGTH, 1)
+                .set(SchemaKeyword.MIN_LENGTH, 1);
     }
 }

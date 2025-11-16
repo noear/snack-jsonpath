@@ -53,5 +53,14 @@ public interface SchemaKeyword {
     String REF = "$ref";
     String SCHEMA = "$schema";
     String DEFS = "$defs";
+    String ANCHOR = "$anchor";
+    String COMMENT = "$comment";
     String DEFINITIONS = "definitions";
+    String DEFAULT = "default";
+    String EXAMPLES = "examples";
+
+    String PROPERTY_NAMES = "propertyNames";
+
+    String READ_ONLY = "readOnly";
+    String WRITE_ONLY = "writeOnly";
 }

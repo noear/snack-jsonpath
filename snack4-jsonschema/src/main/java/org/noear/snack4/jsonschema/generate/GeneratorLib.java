@@ -63,7 +63,6 @@ public class GeneratorLib {
         if (tmp == null) {
             for (TypePatternGenerator b1 : TYPE_PATTERN_GENERATORS) {
                 if (b1.canGenerate(typeEggg)) {
-                    TYPE_GENERATOR_MAP.putIfAbsent(typeEggg.getType(), b1);
                     return b1;
                 }
             }
