@@ -92,8 +92,7 @@ public class StringConstraintRule implements ValidationRule {
 
     private boolean isValidUri(String value) {
         try {
-            // 使用 Java 内建的 URI 解析器进行验证
-            new URI(value).parseServerAuthority();
+            new URI(value);
             return true;
         } catch (URISyntaxException e) {
             return false;

@@ -81,7 +81,7 @@ class JsonSchemaPropertyNamesValidationTest {
         assertDoesNotThrow(() -> schema.validate(ONode.ofJson("{\"urn:isbn:12345\": 2}")));
 
         // 无效用例 1：属性名不是有效的URI (通常的普通字符串)
-        assertThrows(JsonSchemaException.class, () -> schema.validate(ONode.ofJson("{\"my_key\": 1}")));
+        assertThrows(JsonSchemaException.class, () -> schema.validate(ONode.ofJson("{\"a a\": 1}")));
 
         // 无效用例 2：属性名包含非法字符
         assertThrows(JsonSchemaException.class, () -> schema.validate(ONode.ofJson("{\"http://bad url.com\": 2}")));
