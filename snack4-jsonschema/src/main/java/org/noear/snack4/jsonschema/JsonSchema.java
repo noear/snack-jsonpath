@@ -17,7 +17,10 @@ package org.noear.snack4.jsonschema;
 
 import org.noear.eggg.TypeEggg;
 import org.noear.snack4.ONode;
+import org.noear.snack4.jsonschema.generate.GeneratorLib;
 import org.noear.snack4.jsonschema.generate.JsonSchemaGenerator;
+import org.noear.snack4.jsonschema.generate.TypeGenerator;
+import org.noear.snack4.jsonschema.generate.TypePatternGenerator;
 import org.noear.snack4.jsonschema.validate.JsonSchemaValidator;
 import org.noear.snack4.util.Asserts;
 
@@ -35,6 +38,7 @@ public class JsonSchema {
     private final SchemaVersion version;
     private final boolean enableDefinitions;
     private final boolean printVersion;
+    private final GeneratorLib generatorLib = GeneratorLib.newInstance();
 
     public JsonSchema(SchemaVersion version, boolean enableDefinitions, boolean printVersion) {
         this.version = version;
@@ -52,6 +56,32 @@ public class JsonSchema {
 
     public boolean isPrintVersion() {
         return printVersion;
+    }
+
+    /**
+     * 添加生成器
+     */
+    public <T> void addGenerator(TypePatternGenerator<T> generator) {
+        generatorLib.addGenerator(generator);
+    }
+
+    /**
+     * 添加生成器
+     */
+    public <T> void addGenerator(Class<T> type, TypeGenerator<T> generator) {
+        if (generator instanceof TypePatternGenerator) {
+            addGenerator((TypePatternGenerator<T>) generator);
+        }
+
+        generatorLib.addGenerator(type, generator);
+    }
+
+
+    /**
+     * 获取生成器
+     */
+    public TypeGenerator getGenerator(TypeEggg typeEggg) {
+        return generatorLib.getGenerator(typeEggg);
     }
 
 

@@ -34,6 +34,7 @@ import java.util.concurrent.atomic.DoubleAdder;
 import java.util.concurrent.atomic.LongAdder;
 
 /**
+ * 编解码库
  *
  * @author noear 2025/10/3 created
  * @since 4.0

@@ -28,15 +28,68 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * 生成器库
  *
  * @author noear 2025/11/16 created
  * @since 4.0
  */
 public class GeneratorLib {
-    static final List<TypePatternGenerator> TYPE_PATTERN_GENERATORS = new ArrayList<>();
-    static final Map<Class<?>, TypeGenerator> TYPE_GENERATOR_MAP = new ConcurrentHashMap<>();
+    private static final GeneratorLib DEFAULT = new GeneratorLib(null).loadDefault();
 
-    static {
+    private final List<TypePatternGenerator> TYPE_PATTERN_GENERATORS = new ArrayList<>();
+    private final Map<Class<?>, TypeGenerator> TYPE_GENERATOR_MAP = new ConcurrentHashMap<>();
+
+    private final GeneratorLib parent;
+
+    public GeneratorLib(GeneratorLib parent) {
+        this.parent = parent;
+    }
+
+    public static GeneratorLib newInstance() {
+        return new GeneratorLib(DEFAULT);
+    }
+
+    /**
+     * 添加生成器
+     */
+    public <T> void addGenerator(TypePatternGenerator<T> generator) {
+        TYPE_PATTERN_GENERATORS.add(generator);
+    }
+
+    /**
+     * 添加生成器
+     */
+    public <T> void addGenerator(Class<T> type, TypeGenerator<T> generator) {
+        if (generator instanceof TypePatternGenerator) {
+            addGenerator((TypePatternGenerator<T>) generator);
+        }
+
+        TYPE_GENERATOR_MAP.put(type, generator);
+    }
+
+
+    /**
+     * 获取生成器
+     */
+    public TypeGenerator getGenerator(TypeEggg typeEggg) {
+        TypeGenerator generator = TYPE_GENERATOR_MAP.get(typeEggg.getType());
+
+        if (generator == null) {
+            for (TypePatternGenerator b1 : TYPE_PATTERN_GENERATORS) {
+                if (b1.canGenerate(typeEggg)) {
+                    return b1;
+                }
+            }
+
+            if (parent != null) {
+                return parent.getGenerator(typeEggg);
+            }
+        }
+
+        return generator;
+    }
+
+    private GeneratorLib loadDefault() {
         TYPE_PATTERN_GENERATORS.add(new _DatePatternGenerator());
         TYPE_PATTERN_GENERATORS.add(new _EnumPatternGenerator());
         TYPE_PATTERN_GENERATORS.add(new _NumberPatternGenerator());
@@ -56,40 +109,7 @@ public class GeneratorLib {
         TYPE_GENERATOR_MAP.put(LocalDate.class, new LocalDateGenerator());
         TYPE_GENERATOR_MAP.put(LocalTime.class, new LocalTimeGenerator());
         TYPE_GENERATOR_MAP.put(LocalDateTime.class, new LocalDateTimeGenerator());
-    }
 
-    /**
-     * 获取生成器
-     */
-    public static TypeGenerator getGenerator(TypeEggg typeEggg) {
-        TypeGenerator tmp = TYPE_GENERATOR_MAP.get(typeEggg.getType());
-
-        if (tmp == null) {
-            for (TypePatternGenerator b1 : TYPE_PATTERN_GENERATORS) {
-                if (b1.canGenerate(typeEggg)) {
-                    return b1;
-                }
-            }
-        }
-
-        return tmp;
-    }
-
-    /**
-     * 添加生成器
-     */
-    public static <T> void addGenerator(TypePatternGenerator<T> generator) {
-        TYPE_PATTERN_GENERATORS.add(generator);
-    }
-
-    /**
-     * 添加生成器
-     */
-    public static <T> void addGenerator(Class<T> type, TypeGenerator<T> generator) {
-        if (generator instanceof TypePatternGenerator) {
-            addGenerator((TypePatternGenerator<T>) generator);
-        }
-
-        TYPE_GENERATOR_MAP.put(type, generator);
+        return this;
     }
 }
