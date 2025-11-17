@@ -19,6 +19,7 @@ import org.noear.snack4.ONode;
 import org.noear.snack4.codec.DecodeContext;
 import org.noear.snack4.codec.ObjectDecoder;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 /**
@@ -32,6 +33,8 @@ public class BigIntegerDecoder implements ObjectDecoder<BigInteger> {
         if (node.isNumber()) {
             if (node.getValue() instanceof BigInteger) {
                 return (BigInteger) node.getValue();
+            } else {
+                return new BigInteger(node.getValue().toString());
             }
         }
 

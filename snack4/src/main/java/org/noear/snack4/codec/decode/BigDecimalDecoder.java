@@ -32,6 +32,8 @@ public class BigDecimalDecoder implements ObjectDecoder<BigDecimal> {
         if (node.isNumber()) {
             if (node.getValue() instanceof BigDecimal) {
                 return (BigDecimal) node.getValue();
+            } else {
+                return new BigDecimal(node.getValue().toString());
             }
         }
 
