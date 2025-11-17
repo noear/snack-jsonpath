@@ -67,14 +67,16 @@ public class EgggUtil {
             if (egggDigestAddins.size() > 0 && s.getAnnotations().length > 0) {
                 for (Map.Entry<Class<? extends Annotation>, EgggDigestAddin> entry : egggDigestAddins.entrySet()) {
                     Annotation anno = s.getElement().getAnnotation(entry.getKey());
-                    ONodeAttrHolder tmp = entry.getValue().apply(ce, s, anno);
 
-                    if (tmp != null) {
-                        return tmp;
+                    if (anno != null) {
+                        ONodeAttrHolder tmp = entry.getValue().apply(ce, s, anno);
+
+                        if (tmp != null) {
+                            return tmp;
+                        }
                     }
                 }
             }
-
 
             if (ref != null) {
                 return ref;
