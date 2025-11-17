@@ -164,7 +164,7 @@ public class JsonSchemaGenerator {
     // 值转ONode处理
     private ONode generateValueToNode(TypeEggg typeEggg, ONode target) throws Throwable {
         // 优先使用自定义编解码器
-        TypeDefiner generator = config.getDefiner(typeEggg);
+        SchemaDefiner generator = config.getDefiner(typeEggg);
         if (generator != null) {
             return generator.define(typeEggg, target);
         }

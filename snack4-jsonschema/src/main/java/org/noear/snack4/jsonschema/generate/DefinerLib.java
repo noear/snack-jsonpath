@@ -36,8 +36,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DefinerLib {
     private static final DefinerLib DEFAULT = new DefinerLib(null).loadDefault();
 
-    private final List<TypePatternDefiner> TYPE_PATTERN_GENERATORS = new ArrayList<>();
-    private final Map<Class<?>, TypeDefiner> TYPE_GENERATOR_MAP = new ConcurrentHashMap<>();
+    private final List<SchemaPatternDefiner> TYPE_PATTERN_GENERATORS = new ArrayList<>();
+    private final Map<Class<?>, SchemaDefiner> TYPE_GENERATOR_MAP = new ConcurrentHashMap<>();
 
     private final DefinerLib parent;
 
@@ -52,16 +52,16 @@ public class DefinerLib {
     /**
      * 添加生成器
      */
-    public <T> void addDefiner(TypePatternDefiner<T> generator) {
+    public <T> void addDefiner(SchemaPatternDefiner<T> generator) {
         TYPE_PATTERN_GENERATORS.add(generator);
     }
 
     /**
      * 添加生成器
      */
-    public <T> void addDefiner(Class<T> type, TypeDefiner<T> generator) {
-        if (generator instanceof TypePatternDefiner) {
-            addDefiner((TypePatternDefiner<T>) generator);
+    public <T> void addDefiner(Class<T> type, SchemaDefiner<T> generator) {
+        if (generator instanceof SchemaPatternDefiner) {
+            addDefiner((SchemaPatternDefiner<T>) generator);
         }
 
         TYPE_GENERATOR_MAP.put(type, generator);
@@ -71,11 +71,11 @@ public class DefinerLib {
     /**
      * 获取生成器
      */
-    public TypeDefiner getDefiner(TypeEggg typeEggg) {
-        TypeDefiner tmp = TYPE_GENERATOR_MAP.get(typeEggg.getType());
+    public SchemaDefiner getDefiner(TypeEggg typeEggg) {
+        SchemaDefiner tmp = TYPE_GENERATOR_MAP.get(typeEggg.getType());
 
         if (tmp == null) {
-            for (TypePatternDefiner b1 : TYPE_PATTERN_GENERATORS) {
+            for (SchemaPatternDefiner b1 : TYPE_PATTERN_GENERATORS) {
                 if (b1.canDefine(typeEggg)) {
                     return b1;
                 }

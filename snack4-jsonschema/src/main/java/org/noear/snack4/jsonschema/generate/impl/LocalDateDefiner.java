@@ -20,7 +20,7 @@ import org.noear.snack4.ONode;
 import org.noear.snack4.jsonschema.SchemaFormat;
 import org.noear.snack4.jsonschema.SchemaKeyword;
 import org.noear.snack4.jsonschema.SchemaType;
-import org.noear.snack4.jsonschema.generate.TypeDefiner;
+import org.noear.snack4.jsonschema.generate.SchemaDefiner;
 
 import java.time.LocalDate;
 
@@ -29,7 +29,7 @@ import java.time.LocalDate;
  * @author noear 2025/11/14 created
  * @since 4.0
  */
-public class LocalDateDefiner implements TypeDefiner<LocalDate> {
+public class LocalDateDefiner implements SchemaDefiner<LocalDate> {
     @Override
     public ONode define(TypeEggg typeEggg, ONode target) {
         return target.set(SchemaKeyword.TYPE, SchemaType.STRING)

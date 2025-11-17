@@ -19,14 +19,14 @@ import org.noear.eggg.TypeEggg;
 import org.noear.snack4.ONode;
 import org.noear.snack4.jsonschema.SchemaKeyword;
 import org.noear.snack4.jsonschema.SchemaType;
-import org.noear.snack4.jsonschema.generate.TypeDefiner;
+import org.noear.snack4.jsonschema.generate.SchemaDefiner;
 
 /**
  *
  * @author noear 2025/11/14 created
  * @since 4.0
  */
-public class ByteArrayDefiner implements TypeDefiner {
+public class ByteArrayDefiner implements SchemaDefiner {
     private static final ByteArrayDefiner instance = new ByteArrayDefiner();
 
     public static ByteArrayDefiner getInstance() {

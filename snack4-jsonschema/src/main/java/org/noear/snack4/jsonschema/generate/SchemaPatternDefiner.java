@@ -16,14 +16,16 @@
 package org.noear.snack4.jsonschema.generate;
 
 import org.noear.eggg.TypeEggg;
-import org.noear.snack4.ONode;
 
 /**
- * 类型架构生成器
+ * 架构模式定义
  *
  * @author noear 2025/11/14 created
  * @since 4.0
  */
-public interface TypeDefiner<T> {
-    ONode define(TypeEggg typeEggg, ONode target);
+public interface SchemaPatternDefiner<T> extends SchemaDefiner<T> {
+    /**
+     * 可以定义的
+     */
+    boolean canDefine(TypeEggg typeEggg);
 }

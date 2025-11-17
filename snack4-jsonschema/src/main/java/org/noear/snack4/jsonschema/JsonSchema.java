@@ -19,8 +19,8 @@ import org.noear.eggg.TypeEggg;
 import org.noear.snack4.ONode;
 import org.noear.snack4.jsonschema.generate.DefinerLib;
 import org.noear.snack4.jsonschema.generate.JsonSchemaGenerator;
-import org.noear.snack4.jsonschema.generate.TypeDefiner;
-import org.noear.snack4.jsonschema.generate.TypePatternDefiner;
+import org.noear.snack4.jsonschema.generate.SchemaDefiner;
+import org.noear.snack4.jsonschema.generate.SchemaPatternDefiner;
 import org.noear.snack4.jsonschema.validate.JsonSchemaValidator;
 import org.noear.snack4.util.Asserts;
 
@@ -61,16 +61,16 @@ public class JsonSchema {
     /**
      * 添加类型定义
      */
-    public <T> void addDefiner(TypePatternDefiner<T> generator) {
+    public <T> void addDefiner(SchemaPatternDefiner<T> generator) {
         definerLib.addDefiner(generator);
     }
 
     /**
      * 添加类型定义
      */
-    public <T> void addDefiner(Class<T> type, TypeDefiner<T> generator) {
-        if (generator instanceof TypePatternDefiner) {
-            addDefiner((TypePatternDefiner<T>) generator);
+    public <T> void addDefiner(Class<T> type, SchemaDefiner<T> generator) {
+        if (generator instanceof SchemaPatternDefiner) {
+            addDefiner((SchemaPatternDefiner<T>) generator);
         }
 
         definerLib.addDefiner(type, generator);
@@ -80,7 +80,7 @@ public class JsonSchema {
     /**
      * 获取类型定义
      */
-    public TypeDefiner getDefiner(TypeEggg typeEggg) {
+    public SchemaDefiner getDefiner(TypeEggg typeEggg) {
         return definerLib.getDefiner(typeEggg);
     }
 

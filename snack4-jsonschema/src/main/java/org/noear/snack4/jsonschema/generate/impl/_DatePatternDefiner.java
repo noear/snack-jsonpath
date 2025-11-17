@@ -20,7 +20,7 @@ import org.noear.snack4.ONode;
 import org.noear.snack4.jsonschema.SchemaFormat;
 import org.noear.snack4.jsonschema.SchemaKeyword;
 import org.noear.snack4.jsonschema.SchemaType;
-import org.noear.snack4.jsonschema.generate.TypePatternDefiner;
+import org.noear.snack4.jsonschema.generate.SchemaPatternDefiner;
 
 import java.util.Date;
 
@@ -29,7 +29,7 @@ import java.util.Date;
  * @author noear 2025/10/3 created
  * @since 4.0
  */
-public class _DatePatternDefiner implements TypePatternDefiner {
+public class _DatePatternDefiner implements SchemaPatternDefiner {
     @Override
     public boolean canDefine(TypeEggg typeEggg) {
         return Date.class.isAssignableFrom(typeEggg.getType());

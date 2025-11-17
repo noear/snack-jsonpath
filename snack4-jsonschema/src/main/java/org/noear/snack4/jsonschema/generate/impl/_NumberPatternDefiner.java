@@ -19,7 +19,7 @@ import org.noear.eggg.TypeEggg;
 import org.noear.snack4.ONode;
 import org.noear.snack4.jsonschema.SchemaKeyword;
 import org.noear.snack4.jsonschema.SchemaType;
-import org.noear.snack4.jsonschema.generate.TypePatternDefiner;
+import org.noear.snack4.jsonschema.generate.SchemaPatternDefiner;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -32,7 +32,7 @@ import java.math.BigInteger;
  * @author noear 2025/11/14 created
  * @since 4.0
  */
-public class _NumberPatternDefiner implements TypePatternDefiner {
+public class _NumberPatternDefiner implements SchemaPatternDefiner {
     private static final Set<Class<?>> INTEGER_TYPES = new HashSet<>(
             Arrays.asList(Short.class, short.class,
                     Integer.class, int.class,

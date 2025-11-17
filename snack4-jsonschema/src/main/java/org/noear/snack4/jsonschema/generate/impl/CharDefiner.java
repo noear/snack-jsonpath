@@ -19,14 +19,14 @@ import org.noear.eggg.TypeEggg;
 import org.noear.snack4.ONode;
 import org.noear.snack4.jsonschema.SchemaKeyword;
 import org.noear.snack4.jsonschema.SchemaType;
-import org.noear.snack4.jsonschema.generate.TypeDefiner;
+import org.noear.snack4.jsonschema.generate.SchemaDefiner;
 
 /**
  *
  * @author noear 2025/11/14 created
  * @since 4.0
  */
-public class CharDefiner implements TypeDefiner {
+public class CharDefiner implements SchemaDefiner {
     private static final CharDefiner instance = new CharDefiner();
 
     public static CharDefiner getInstance() {
