@@ -31,6 +31,7 @@ import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * JSON 节点抽象
@@ -172,9 +173,27 @@ public final class ONode {
         return this;
     }
 
+    public ONode asObject(Supplier<Map> factory) {
+        if (value == null) {
+            value = factory.get();
+            type = DataType.Object;
+        }
+
+        return this;
+    }
+
     public ONode asArray() {
         if (value == null) {
             value = options.createList();
+            type = DataType.Array;
+        }
+
+        return this;
+    }
+
+    public ONode asArray(Supplier<List> factory) {
+        if (value == null) {
+            value = factory.get();
             type = DataType.Array;
         }
 
