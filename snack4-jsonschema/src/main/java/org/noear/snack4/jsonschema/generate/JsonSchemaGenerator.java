@@ -20,13 +20,13 @@ import org.noear.eggg.Property;
 import org.noear.eggg.PropertyEggg;
 import org.noear.eggg.TypeEggg;
 import org.noear.snack4.ONode;
+import org.noear.snack4.Options;
 import org.noear.snack4.annotation.ONodeAttrHolder;
 import org.noear.snack4.codec.util.EgggUtil;
 import org.noear.snack4.jsonschema.JsonSchemaException;
 import org.noear.snack4.jsonschema.SchemaKeyword;
 import org.noear.snack4.jsonschema.SchemaType;
 import org.noear.snack4.jsonschema.SchemaVersion;
-import org.noear.snack4.jsonschema.generate.impl.*;
 import org.noear.snack4.util.Asserts;
 
 import java.lang.reflect.Type;
@@ -48,6 +48,8 @@ public class JsonSchemaGenerator {
     private final Map<String, ONode> definitions;
     private int definitionCounter = 0;
 
+    private Options options;
+
     public JsonSchemaGenerator withVersion(SchemaVersion version) {
         this.version = version;
         return this;
@@ -60,6 +62,11 @@ public class JsonSchemaGenerator {
 
     public JsonSchemaGenerator withPrintVersion(boolean printVersion) {
         this.printVersion = printVersion;
+        return this;
+    }
+
+    public JsonSchemaGenerator withOptions(Options options) {
+        this.options = options;
         return this;
     }
 
@@ -90,7 +97,7 @@ public class JsonSchemaGenerator {
     }
 
     private ONode doGenerate() throws Throwable {
-        ONode target = new ONode();
+        ONode target = new ONode(options);
 
         if (printVersion) {
             target.set(SchemaKeyword.SCHEMA, version.getIdentifier());
@@ -149,7 +156,7 @@ public class JsonSchemaGenerator {
 
     // 创建引用节点
     private ONode createReference(String definitionName) {
-        ONode refNode = new ONode().asObject();
+        ONode refNode = new ONode(options).asObject();
         refNode.set(SchemaKeyword.REF, "#/" + getDefinitionsKey() + "/" + definitionName);
         return refNode;
     }
@@ -195,7 +202,7 @@ public class JsonSchemaGenerator {
 
 
         try {
-            ONode oProperties = target.getOrNew(SchemaKeyword.PROPERTIES).asObject();
+            ONode oProperties = target.getOrNew(SchemaKeyword.PROPERTIES).asObject(TreeMap::new);
             ONode oRequired = target.getOrNew(SchemaKeyword.REQUIRED).asArray();
 
             ClassEggg classEggg = typeEggg.getClassEggg();
@@ -217,7 +224,7 @@ public class JsonSchemaGenerator {
                     continue;
                 }
 
-                ONode propertyNode = generateValueToNode(property.getTypeEggg(), attr, new ONode());
+                ONode propertyNode = generateValueToNode(property.getTypeEggg(), attr, new ONode(options));
 
                 if (propertyNode != null) {
                     if (Asserts.isNotEmpty(attr.getDescription())) {
@@ -267,7 +274,7 @@ public class JsonSchemaGenerator {
         }
 
         // 即使没有启用定义，也要返回一个占位符而不是null
-        return new ONode().asObject()
+        return new ONode(options).asObject()
                 .set(SchemaKeyword.TYPE, SchemaType.OBJECT)
                 .set(SchemaKeyword.DESCRIPTION, "Circular reference detected for: " + typeEggg.getType().getSimpleName());
     }
@@ -276,7 +283,7 @@ public class JsonSchemaGenerator {
     private ONode generateArrayToNode(TypeEggg typeEggg, ONode target) throws Throwable {
         target.set(SchemaKeyword.TYPE, SchemaType.ARRAY);
 
-        ONode itemsType = generateValueToNode(EgggUtil.getTypeEggg(typeEggg.getType().getComponentType()), null, new ONode());
+        ONode itemsType = generateValueToNode(EgggUtil.getTypeEggg(typeEggg.getType().getComponentType()), null, new ONode(options));
         target.set(SchemaKeyword.ITEMS, itemsType);
 
         return target;
@@ -287,7 +294,7 @@ public class JsonSchemaGenerator {
         target.set(SchemaKeyword.TYPE, SchemaType.ARRAY);
 
         if (typeEggg.isParameterizedType()) {
-            ONode itemsType = generateValueToNode(EgggUtil.getTypeEggg(typeEggg.getActualTypeArguments()[0]), null, new ONode());
+            ONode itemsType = generateValueToNode(EgggUtil.getTypeEggg(typeEggg.getActualTypeArguments()[0]), null, new ONode(options));
             target.set(SchemaKeyword.ITEMS, itemsType);
         }
 
@@ -305,18 +312,18 @@ public class JsonSchemaGenerator {
 
 
             if (keyEggg.getType() != Object.class && keyEggg.getType() != String.class) {
-                ONode keySchema = generateValueToNode(keyEggg, null, new ONode());
+                ONode keySchema = generateValueToNode(keyEggg, null, new ONode(options));
 
                 if (keySchema != null) {
-                    ONode propertyNamesSchema = new ONode().asObject();
+                    ONode propertyNamesSchema = new ONode(options).asObject();
                     propertyNamesSchema.set(SchemaKeyword.TYPE, SchemaType.STRING);
-                    ONode propertyNamesInnerSchema = generateValueToNode(keyEggg, null, new ONode());
+                    ONode propertyNamesInnerSchema = generateValueToNode(keyEggg, null, new ONode(options));
                     target.set(SchemaKeyword.PROPERTY_NAMES, propertyNamesInnerSchema);
                 }
             }
 
             if (valueEggg.getType() != Object.class) {
-                ONode valueSchema = generateValueToNode(valueEggg, null, new ONode());
+                ONode valueSchema = generateValueToNode(valueEggg, null, new ONode(options));
                 target.set(SchemaKeyword.ADDITIONAL_PROPERTIES, valueSchema);
             } else {
                 target.set(SchemaKeyword.ADDITIONAL_PROPERTIES, true);

@@ -24,13 +24,13 @@ public class BaseCompatibleTest {
                 .without(Option.DEFINITIONS_FOR_ALL_OBJECTS)
                 .without(Option.DEFINITIONS_FOR_MEMBER_SUPERTYPES)
                 .without(Option.DEFINITION_FOR_MAIN_SCHEMA)
+                .without(Option.SCHEMA_VERSION_INDICATOR)
                 .with(Option.FLATTENED_SUPPLIERS)
                 .with(Option.FLATTENED_OPTIONALS)
                 .with(Option.FLATTENED_ENUMS);
 
         // --- 1. 定制字段名称 (Name Override) 和 忽略 (Ignore) ---
         configBuilder.forFields()
-                // 检查 @JSONField 注解，如果指定了 name，则使用它作为 JSON 属性名
                 .withPropertyNameOverrideResolver(field -> {
                     ONodeAttr jsonField = field.getAnnotationConsideringFieldAndGetter(ONodeAttr.class);
                     if (jsonField != null && !jsonField.name().isEmpty()) {
@@ -38,10 +38,12 @@ public class BaseCompatibleTest {
                     }
                     return null; // 返回 null 表示使用默认名称
                 })
-                // 检查 @JSONField 注解，如果设置了 serialize = false，则忽略该字段
                 .withIgnoreCheck(field -> {
                     ONodeAttr jsonField = field.getAnnotationConsideringFieldAndGetter(ONodeAttr.class);
                     return jsonField != null && !jsonField.encode();
+                })
+                .withRequiredCheck(field -> {
+                    return field.getAnnotation(ONodeAttr.class) != null;
                 });
 
         // --- 2. 定制描述 (Description) ---

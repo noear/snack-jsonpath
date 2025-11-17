@@ -36,20 +36,14 @@
         <dependency>
             <groupId>org.noear</groupId>
             <artifactId>solon-lib</artifactId>
-            <version>3.6.0</version>
+            <version>3.7.1</version>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.noear</groupId>
-                    <artifactId>solon-config-plus</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
 <!--        <dependency>-->
 <!--            <groupId>org.noear</groupId>-->
 <!--            <artifactId>solon-logging-simple</artifactId>-->
-<!--            <version>3.6.0</version>-->
+<!--            <version>3.7.1</version>-->
 <!--        </dependency>-->
 
         <dependency>

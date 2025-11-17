@@ -20,41 +20,24 @@ import org.noear.snack4.ONode;
 import org.noear.snack4.annotation.ONodeAttrHolder;
 import org.noear.snack4.jsonschema.SchemaKeyword;
 import org.noear.snack4.jsonschema.SchemaType;
-import org.noear.snack4.jsonschema.generate.TypePatternGenerator;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
-import java.math.BigInteger;
+import org.noear.snack4.jsonschema.generate.TypeGenerator;
 
 /**
  *
  * @author noear 2025/11/14 created
  * @since 4.0
  */
-public class _NumberPatternGenerator implements TypePatternGenerator {
-    private static final Set<Class<?>> INTEGER_TYPES = new HashSet<>(
-            Arrays.asList(Short.class, short.class,
-                    Integer.class, int.class,
-                    Long.class, long.class,
-                    BigInteger.class
-            )
-    );
+public class ByteGenerator implements TypeGenerator {
+    private static final ByteGenerator instance = new ByteGenerator();
 
-    @Override
-    public boolean canGenerate(TypeEggg typeEggg) {
-        return typeEggg.isNumber();
+    public static ByteGenerator getInstance() {
+        return instance;
     }
 
     @Override
     public ONode generate(ONodeAttrHolder att, TypeEggg typeEggg, ONode target) {
-        if (INTEGER_TYPES.contains(typeEggg.getType())) {
-            target.set(SchemaKeyword.TYPE, SchemaType.INTEGER);
-        } else {
-            target.set(SchemaKeyword.TYPE, SchemaType.NUMBER);
-        }
-
-        return target;
+        return target.set(SchemaKeyword.TYPE, SchemaType.INTEGER)
+                .set(SchemaKeyword.MINIMUM, -128)
+                .set(SchemaKeyword.MAXIMUM, 127);
     }
 }

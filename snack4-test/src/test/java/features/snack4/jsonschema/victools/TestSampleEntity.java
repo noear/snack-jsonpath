@@ -51,6 +51,7 @@ public class TestSampleEntity {
 
     // 数组和集合类型
     private int[] intArray;
+    private byte[] byteArray;
     private String[] stringArray;
     private List<String> stringList;
     private List<Integer> integerList;

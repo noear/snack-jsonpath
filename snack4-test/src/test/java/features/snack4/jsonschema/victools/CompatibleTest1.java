@@ -1,7 +1,10 @@
 package features.snack4.jsonschema.victools;
 
 import org.junit.jupiter.api.Test;
+import org.noear.snack4.Options;
 import org.noear.snack4.jsonschema.generate.JsonSchemaGenerator;
+
+import java.util.TreeMap;
 
 /**
  *
@@ -15,7 +18,7 @@ public class CompatibleTest1 extends BaseCompatibleTest {
         System.out.println(json);
 
         String json2 = new JsonSchemaGenerator(TestSampleEntity.class)
-                .withPrintVersion(true)
+                .withPrintVersion(false)
                 .withEnableDefinitions(true)
                 .generate()
                 .toJson();

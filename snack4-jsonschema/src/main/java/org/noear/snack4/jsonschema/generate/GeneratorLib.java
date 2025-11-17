@@ -45,6 +45,10 @@ public class GeneratorLib {
         TYPE_GENERATOR_MAP.put(boolean.class, BooleanGenerator.getInstance());
         TYPE_GENERATOR_MAP.put(Character.class, CharGenerator.getInstance());
         TYPE_GENERATOR_MAP.put(char.class, CharGenerator.getInstance());
+        TYPE_GENERATOR_MAP.put(Byte.class, ByteGenerator.getInstance());
+        TYPE_GENERATOR_MAP.put(byte.class, ByteGenerator.getInstance());
+        TYPE_GENERATOR_MAP.put(Byte[].class, ByteArrayGenerator.getInstance());
+        TYPE_GENERATOR_MAP.put(byte[].class, ByteArrayGenerator.getInstance());
 
         TYPE_GENERATOR_MAP.put(String.class, new StringGenerator());
         TYPE_GENERATOR_MAP.put(URI.class, new URIGenerator());

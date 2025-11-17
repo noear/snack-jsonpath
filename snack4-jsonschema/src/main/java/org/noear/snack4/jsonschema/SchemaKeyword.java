@@ -42,6 +42,9 @@ public interface SchemaKeyword {
     String EXCLUSIVE_MAXIMUM = "exclusiveMaximum";
     String EXCLUSIVE_MINIMUM = "exclusiveMinimum";
 
+    String CONTENT_ENCODING = "contentEncoding";
+    String CONTENT_MEDIATYPE = "contentMediaType";
+
     String ITEMS = "items";
     String MIN_ITEMS = "minItems";
     String MAX_ITEMS = "maxItems";
