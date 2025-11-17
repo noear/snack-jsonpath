@@ -187,7 +187,7 @@ public class JsonReader {
     }
 
     private ONode parseObject() throws IOException {
-        Map<String, ONode> map = new LinkedHashMap<>(16);
+        Map<String, ONode> map = opts.createMap();
         state.expect('{');
         while (true) {
             state.skipWhitespace();
@@ -257,7 +257,7 @@ public class JsonReader {
     }
 
     private ONode parseArray() throws IOException {
-        List<ONode> list = new ArrayList<>(10);
+        List<ONode> list = opts.createList();
         state.expect('[');
         while (true) {
             state.skipWhitespace();

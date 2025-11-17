@@ -18,8 +18,10 @@ package org.noear.snack4;
 import org.noear.snack4.codec.*;
 
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.*;
+import java.util.function.Supplier;
 
 /**
  * JSON 处理选项（线程安全配置）
@@ -59,8 +61,11 @@ public final class Options {
     private ClassLoader classLoader;
     //允许安全类
     private Locale locale = DEF_LOCALE;
-
+    //时区
     private TimeZone timeZone = DEF_TIME_ZONE;
+
+    private Supplier<Map> mapFactory = LinkedHashMap::new;
+    private Supplier<List> listFactory =  ArrayList::new;
 
 
     private final boolean readonly;
@@ -142,6 +147,14 @@ public final class Options {
         return writeIndent;
     }
 
+    public <T> Map<String, T> createMap() {
+        return mapFactory.get();
+    }
+
+    public <T> List<T> createList() {
+        return listFactory.get();
+    }
+
 
     /// /////////////
 
@@ -178,6 +191,18 @@ public final class Options {
         }
 
         this.timeZone = timeZone;
+        return this;
+    }
+
+    /**
+     * 设置时区
+     */
+    public Options timeZone(ZoneId zoneId) {
+        if (readonly) {
+            throw new UnsupportedOperationException(DEF_UNSUPPORTED_HINT);
+        }
+
+        this.timeZone = TimeZone.getTimeZone(zoneId);
         return this;
     }
 
@@ -307,6 +332,16 @@ public final class Options {
         }
 
         codecLib.addCreator(creator);
+        return this;
+    }
+
+    public Options mapFactory(Supplier<Map> mapFactory) {
+        this.mapFactory = mapFactory;
+        return this;
+    }
+
+    public Options listFactory(Supplier<List> listFactory) {
+        this.listFactory = listFactory;
         return this;
     }
 

@@ -165,7 +165,7 @@ public final class ONode {
 
     public ONode asObject() {
         if (value == null) {
-            value = new LinkedHashMap<String, ONode>();
+            value = options.createMap();
             type = DataType.Object;
         }
 
@@ -174,7 +174,7 @@ public final class ONode {
 
     public ONode asArray() {
         if (value == null) {
-            value = new ArrayList<ONode>();
+            value = options.createList();
             type = DataType.Array;
         }
 
