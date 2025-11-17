@@ -13,22 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.noear.snack4.jsonschema.generate.impl;
+package org.noear.snack4.jsonschema.generate;
 
 import org.noear.eggg.TypeEggg;
-import org.noear.snack4.ONode;
-import org.noear.snack4.jsonschema.SchemaKeyword;
-import org.noear.snack4.jsonschema.SchemaType;
-import org.noear.snack4.jsonschema.generate.TypeGenerator;
 
 /**
+ * 类型模式架构生成器
  *
  * @author noear 2025/11/14 created
  * @since 4.0
  */
-public class StringGenerator implements TypeGenerator<String> {
-    @Override
-    public ONode generate(TypeEggg typeEggg, ONode target) {
-        return target.set(SchemaKeyword.TYPE, SchemaType.STRING);
-    }
+public interface TypePatternDefiner<T> extends TypeDefiner<T> {
+    /**
+     * 可以编码的
+     */
+    boolean canDefine(TypeEggg typeEggg);
 }

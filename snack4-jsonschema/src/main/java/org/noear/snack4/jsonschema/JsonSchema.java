@@ -17,10 +17,10 @@ package org.noear.snack4.jsonschema;
 
 import org.noear.eggg.TypeEggg;
 import org.noear.snack4.ONode;
-import org.noear.snack4.jsonschema.generate.GeneratorLib;
+import org.noear.snack4.jsonschema.generate.DefinerLib;
 import org.noear.snack4.jsonschema.generate.JsonSchemaGenerator;
-import org.noear.snack4.jsonschema.generate.TypeGenerator;
-import org.noear.snack4.jsonschema.generate.TypePatternGenerator;
+import org.noear.snack4.jsonschema.generate.TypeDefiner;
+import org.noear.snack4.jsonschema.generate.TypePatternDefiner;
 import org.noear.snack4.jsonschema.validate.JsonSchemaValidator;
 import org.noear.snack4.util.Asserts;
 
@@ -38,7 +38,7 @@ public class JsonSchema {
     private final SchemaVersion version;
     private final boolean enableDefinitions;
     private final boolean printVersion;
-    private final GeneratorLib generatorLib = GeneratorLib.newInstance();
+    private final DefinerLib definerLib = DefinerLib.newInstance();
 
     public JsonSchema(SchemaVersion version, boolean enableDefinitions, boolean printVersion) {
         this.version = version;
@@ -59,29 +59,29 @@ public class JsonSchema {
     }
 
     /**
-     * 添加生成器
+     * 添加类型定义
      */
-    public <T> void addGenerator(TypePatternGenerator<T> generator) {
-        generatorLib.addGenerator(generator);
+    public <T> void addDefiner(TypePatternDefiner<T> generator) {
+        definerLib.addDefiner(generator);
     }
 
     /**
-     * 添加生成器
+     * 添加类型定义
      */
-    public <T> void addGenerator(Class<T> type, TypeGenerator<T> generator) {
-        if (generator instanceof TypePatternGenerator) {
-            addGenerator((TypePatternGenerator<T>) generator);
+    public <T> void addDefiner(Class<T> type, TypeDefiner<T> generator) {
+        if (generator instanceof TypePatternDefiner) {
+            addDefiner((TypePatternDefiner<T>) generator);
         }
 
-        generatorLib.addGenerator(type, generator);
+        definerLib.addDefiner(type, generator);
     }
 
 
     /**
-     * 获取生成器
+     * 获取类型定义
      */
-    public TypeGenerator getGenerator(TypeEggg typeEggg) {
-        return generatorLib.getGenerator(typeEggg);
+    public TypeDefiner getDefiner(TypeEggg typeEggg) {
+        return definerLib.getDefiner(typeEggg);
     }
 
 

@@ -112,9 +112,9 @@ public class CodecLib {
     }
 
     public ObjectDecoder getDecoder(Class<?> clazz) {
-        ObjectDecoder decoder = decoders.get(clazz);
+        ObjectDecoder tmp = decoders.get(clazz);
 
-        if (decoder == null) {
+        if (tmp == null) {
             for (ObjectPatternDecoder decoder1 : patternDecoders) {
                 if (decoder1.canDecode(clazz)) {
                     return decoder1;
@@ -126,13 +126,13 @@ public class CodecLib {
             }
         }
 
-        return decoder;
+        return tmp;
     }
 
     public ObjectCreator getCreator(Class<?> clazz) {
-        ObjectCreator creator = creators.get(clazz);
+        ObjectCreator tmp = creators.get(clazz);
 
-        if (creator == null) {
+        if (tmp == null) {
             for (ObjectPatternCreator<?> creator1 : patternCreators) {
                 if (creator1.calCreate(clazz)) {
                     return creator1;
@@ -144,7 +144,7 @@ public class CodecLib {
             }
         }
 
-        return creator;
+        return tmp;
     }
 
     public ObjectEncoder getEncoder(Object value) {

@@ -19,25 +19,29 @@ import org.noear.eggg.TypeEggg;
 import org.noear.snack4.ONode;
 import org.noear.snack4.jsonschema.SchemaKeyword;
 import org.noear.snack4.jsonschema.SchemaType;
-import org.noear.snack4.jsonschema.generate.TypeGenerator;
+import org.noear.snack4.jsonschema.generate.TypePatternDefiner;
 
 /**
  *
  * @author noear 2025/11/14 created
  * @since 4.0
  */
-public class CharGenerator implements TypeGenerator {
-    private static final CharGenerator instance = new CharGenerator();
-
-    public static CharGenerator getInstance() {
-        return instance;
+public class _EnumPatternDefiner implements TypePatternDefiner {
+    @Override
+    public boolean canDefine(TypeEggg typeEggg) {
+        return typeEggg.isEnum();
     }
 
-
     @Override
-    public ONode generate(TypeEggg typeEggg, ONode target) {
-        return target.set(SchemaKeyword.TYPE, SchemaType.STRING)
-                .set(SchemaKeyword.MAX_LENGTH, 1)
-                .set(SchemaKeyword.MIN_LENGTH, 1);
+    public ONode define(TypeEggg typeEggg, ONode target) {
+        target.set(SchemaKeyword.TYPE, SchemaType.STRING);
+
+        target.getOrNew(SchemaKeyword.ENUM).then(n -> {
+            for (Object e : typeEggg.getType().getEnumConstants()) {
+                n.add(e.toString());
+            }
+        });
+
+        return target;
     }
 }

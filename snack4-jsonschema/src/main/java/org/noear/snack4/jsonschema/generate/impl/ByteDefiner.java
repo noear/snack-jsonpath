@@ -17,22 +17,26 @@ package org.noear.snack4.jsonschema.generate.impl;
 
 import org.noear.eggg.TypeEggg;
 import org.noear.snack4.ONode;
-import org.noear.snack4.jsonschema.SchemaFormat;
 import org.noear.snack4.jsonschema.SchemaKeyword;
 import org.noear.snack4.jsonschema.SchemaType;
-import org.noear.snack4.jsonschema.generate.TypeGenerator;
-
-import java.time.LocalDateTime;
+import org.noear.snack4.jsonschema.generate.TypeDefiner;
 
 /**
  *
  * @author noear 2025/11/14 created
  * @since 4.0
  */
-public class LocalDateTimeGenerator implements TypeGenerator<LocalDateTime> {
+public class ByteDefiner implements TypeDefiner {
+    private static final ByteDefiner instance = new ByteDefiner();
+
+    public static ByteDefiner getInstance() {
+        return instance;
+    }
+
     @Override
-    public ONode generate(TypeEggg typeEggg, ONode target) {
-        return target.set(SchemaKeyword.TYPE, SchemaType.STRING)
-                .set(SchemaKeyword.FORMAT, SchemaFormat.DATE_TIME);
+    public ONode define(TypeEggg typeEggg, ONode target) {
+        return target.set(SchemaKeyword.TYPE, SchemaType.INTEGER)
+                .set(SchemaKeyword.MINIMUM, -128)
+                .set(SchemaKeyword.MAXIMUM, 127);
     }
 }

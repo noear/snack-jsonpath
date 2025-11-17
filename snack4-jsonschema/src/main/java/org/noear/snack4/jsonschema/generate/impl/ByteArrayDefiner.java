@@ -17,27 +17,26 @@ package org.noear.snack4.jsonschema.generate.impl;
 
 import org.noear.eggg.TypeEggg;
 import org.noear.snack4.ONode;
-import org.noear.snack4.jsonschema.SchemaFormat;
 import org.noear.snack4.jsonschema.SchemaKeyword;
 import org.noear.snack4.jsonschema.SchemaType;
-import org.noear.snack4.jsonschema.generate.TypePatternGenerator;
-
-import java.util.Date;
+import org.noear.snack4.jsonschema.generate.TypeDefiner;
 
 /**
  *
- * @author noear 2025/10/3 created
+ * @author noear 2025/11/14 created
  * @since 4.0
  */
-public class _DatePatternGenerator implements TypePatternGenerator {
-    @Override
-    public boolean canGenerate(TypeEggg typeEggg) {
-        return Date.class.isAssignableFrom(typeEggg.getType());
+public class ByteArrayDefiner implements TypeDefiner {
+    private static final ByteArrayDefiner instance = new ByteArrayDefiner();
+
+    public static ByteArrayDefiner getInstance() {
+        return instance;
     }
 
     @Override
-    public ONode generate(TypeEggg typeEggg, ONode target) {
+    public ONode define(TypeEggg typeEggg, ONode target) {
         return target.set(SchemaKeyword.TYPE, SchemaType.STRING)
-                .set(SchemaKeyword.FORMAT, SchemaFormat.DATE_TIME);
+                .set(SchemaKeyword.CONTENT_ENCODING, "base64")
+                .set(SchemaKeyword.CONTENT_MEDIATYPE, "application/octet-stream");
     }
 }

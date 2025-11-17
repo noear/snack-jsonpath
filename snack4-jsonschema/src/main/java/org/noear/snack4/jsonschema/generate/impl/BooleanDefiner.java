@@ -19,29 +19,22 @@ import org.noear.eggg.TypeEggg;
 import org.noear.snack4.ONode;
 import org.noear.snack4.jsonschema.SchemaKeyword;
 import org.noear.snack4.jsonschema.SchemaType;
-import org.noear.snack4.jsonschema.generate.TypePatternGenerator;
+import org.noear.snack4.jsonschema.generate.TypeDefiner;
 
 /**
  *
  * @author noear 2025/11/14 created
  * @since 4.0
  */
-public class _EnumPatternGenerator implements TypePatternGenerator {
-    @Override
-    public boolean canGenerate(TypeEggg typeEggg) {
-        return typeEggg.isEnum();
+public class BooleanDefiner implements TypeDefiner {
+    private static final BooleanDefiner instance = new BooleanDefiner();
+
+    public static BooleanDefiner getInstance() {
+        return instance;
     }
 
     @Override
-    public ONode generate(TypeEggg typeEggg, ONode target) {
-        target.set(SchemaKeyword.TYPE, SchemaType.STRING);
-
-        target.getOrNew(SchemaKeyword.ENUM).then(n -> {
-            for (Object e : typeEggg.getType().getEnumConstants()) {
-                n.add(e.toString());
-            }
-        });
-
-        return target;
+    public ONode define(TypeEggg typeEggg, ONode target) {
+        return target.set(SchemaKeyword.TYPE, SchemaType.BOOLEAN);
     }
 }

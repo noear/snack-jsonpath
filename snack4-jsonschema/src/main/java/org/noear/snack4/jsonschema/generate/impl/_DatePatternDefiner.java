@@ -20,19 +20,24 @@ import org.noear.snack4.ONode;
 import org.noear.snack4.jsonschema.SchemaFormat;
 import org.noear.snack4.jsonschema.SchemaKeyword;
 import org.noear.snack4.jsonschema.SchemaType;
-import org.noear.snack4.jsonschema.generate.TypeGenerator;
+import org.noear.snack4.jsonschema.generate.TypePatternDefiner;
 
-import java.time.LocalDate;
+import java.util.Date;
 
 /**
  *
- * @author noear 2025/11/14 created
+ * @author noear 2025/10/3 created
  * @since 4.0
  */
-public class LocalDateGenerator implements TypeGenerator<LocalDate> {
+public class _DatePatternDefiner implements TypePatternDefiner {
     @Override
-    public ONode generate(TypeEggg typeEggg, ONode target) {
+    public boolean canDefine(TypeEggg typeEggg) {
+        return Date.class.isAssignableFrom(typeEggg.getType());
+    }
+
+    @Override
+    public ONode define(TypeEggg typeEggg, ONode target) {
         return target.set(SchemaKeyword.TYPE, SchemaType.STRING)
-                .set(SchemaKeyword.FORMAT, SchemaFormat.DATE);
+                .set(SchemaKeyword.FORMAT, SchemaFormat.DATE_TIME);
     }
 }
