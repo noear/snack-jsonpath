@@ -1,5 +1,5 @@
 <h1 align="center" style="text-align:center;">
-  Snack
+  SnackJson
 </h1>
 <p align="center">
 	<strong>A Json framework with support for JsonDom, JsonPath, JsonSchema (for Java)</strong>
@@ -50,21 +50,11 @@
 
 <hr />
 
-jdk8 based. Support: Json Dom construction, encoding and decoding, fetching, JsonPath query, JsonSchema validation.
+SnackJson draws on the design of `Javascript` where all variables are declared with `var` and `Xml dom` where everything is `Node`. Everything underneath it is represented by an `ONode`, which stands for `One node` and can be converted to any type.
 
-```xml
-<dependency>
-    <groupId>org.noear</groupId>
-    <artifactId>snack4-jsonpath</artifactId>
-    <version>...</version>
-</dependency>
-```
-
-Snach-jsonpath draws on the design of `Javascript` where all variables are declared with `var` and `Xml dom` where everything is `Node`. Everything underneath it is represented by an `ONode`, which stands for `One node` and can be converted to any type.
-
-* It emphasizes the ability to build and manipulate the document tree
+* Emphasize the ability to build and manipulate the `Json dom`
 * High performance `Json path` queries (much faster than `jayway.jsonpath`), Compatible with `jayway.jsonpath` and [IETF JSONPath (RFC 9535)](https://www.rfc-editor.org/rfc/rfc9535.html) standards (Switch with `optoins`). Deliver the next generation of JsonPath experiences.
-* Supports `Json Schema` validation
+* Provides `Json schema` construction and validation, compatible with JsonSchema draw-07, draw-2019 standards
 * Support some 'json5' features (keyless fields, comments, etc...)
 * Prefer no-argument constructors + field codec (reduces the risk of triggering actions by injection)
 

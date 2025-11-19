@@ -1,5 +1,5 @@
 <h1 align="center" style="text-align:center;">
-  Snack
+  SnackJson
 </h1>
 <p align="center">
 	<strong>一个 Json 框架，支持 JsonDom、JsonPath、JsonSchema（for Java）</strong>
@@ -50,21 +50,11 @@
 
 <hr />
 
-基于jdk8。支持：Json Dom 的构建、编码解转换、获取、JsonPath 查询、JsonSchema 验证。
+SnackJson 借鉴了 `Javascript` 所有变量由 `var` 申明，及 `Xml dom` 一切都是 `Node` 的设计。其下一切数据都以`ONode`表示，`ONode`也即 `One node` 之意，代表任何类型，也可以转换为任何类型。
 
-```xml
-<dependency>
-    <groupId>org.noear</groupId>
-    <artifactId>snack4-jsonpath</artifactId>
-    <version>...</version>
-</dependency>
-```
-
-Snack-Jsonpath 借鉴了 `Javascript` 所有变量由 `var` 申明，及 `Xml dom` 一切都是 `Node` 的设计。其下一切数据都以`ONode`表示，`ONode`也即 `One node` 之意，代表任何类型，也可以转换为任何类型。
-
-* 强调文档树的构建和操控能力
-* 高性能`Json path`查询（比 jayway.jsonpath 快很多），同时兼容 `jayway.jsonpath` 和 [IETF JSONPath (RFC 9535) 标准](https://www.rfc-editor.org/rfc/rfc9535.html) (用 `options` 切换)。提供新一代 JsonPath 体验。
-* 支持 `Json schema` 架构校验
+* 强调 `Json dom` 的构建和操控能力
+* 可以 `Json path` 高性能查询（比 jayway.jsonpath 快很多），同时兼容 `jayway.jsonpath` 和 [IETF JSONPath (RFC 9535) 标准](https://www.rfc-editor.org/rfc/rfc9535.html) (用 `options` 切换)。提供新一代 JsonPath 体验。
+* 提供 `Json schema` 构建与校验，兼容 JsonSchema draft-07、draft-2019 标准
 * 支持 `json5` 部分特性（无键字段，注释，等...）
 * 优先使用 无参构造函数 + 字段 编解码（可减少注入而触发动作的风险）
 
