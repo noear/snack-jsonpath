@@ -35,7 +35,7 @@ public class URLDecoder implements ObjectDecoder<URL> {
             if (node.isNotEmptyString()) {
                 return URI.create(node.<String>getValueAs()).toURL();
             } else {
-                return null;
+                throw new CodecException("URL decoding failed: " + node.getString());
             }
         } catch (Exception e) {
             throw new CodecException(e);
