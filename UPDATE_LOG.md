@@ -1,4 +1,8 @@
 
+### 4.0.15
+
+* eggg 升为 1.0.9
+
 ### 4.0.14
 
 * 修复 BigIntegerDecoder，BigDecimalDecoder 不能转数字的问题（4.0.13 出现的）
