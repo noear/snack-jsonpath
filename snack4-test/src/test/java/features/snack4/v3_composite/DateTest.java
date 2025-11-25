@@ -4,6 +4,7 @@ import demo.snack4._models.DateModel;
 import demo.snack4._models.DateModel2;
 import demo.snack4._models.DateModel3;
 import lombok.Data;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.noear.snack4.Feature;
 import org.noear.snack4.ONode;
@@ -27,16 +28,18 @@ public class DateTest {
         String json = "{date1:'2021-06-13T20:54:51.566Z', date2:'2021-06-13T20:54:51', date3:'2021-06-13 20:54:51', date4:'20210613205451566+0800', date5:'2021-06-13', date6:'2021-06-13T20:54:51.566+08:00', date7:'2021-06-13 20:54:51,566', date8:'2021-06-13 20:54:51.566', date9:'20:54:51'}";
         DateModel dateModel = ONode.ofJson(json).toBean(DateModel.class);
 
-        assert dateModel.date1.getTime() == 1623588891566L;
-        assert dateModel.date2.getTime() == 1623588891000L;
-        assert dateModel.date3.getTime() == 1623588891000L;
-        assert dateModel.date4.getTime() == 1623588891566L;
-        assert dateModel.date5.getTime() == 1623513600000L;
-        assert dateModel.date6.getTime() == 1623588891566L;
-        assert dateModel.date7.getTime() == 1623588891566L;
-        assert dateModel.date8.getTime() == 1623588891566L;
-        assert dateModel.date9.getTime() == 46491000L;
+        Assertions.assertEquals(1623617691566L, dateModel.date1.getTime());
 
+        Assertions.assertEquals(1623588891000L, dateModel.date2.getTime());
+        Assertions.assertEquals(1623588891000L, dateModel.date3.getTime());
+
+        Assertions.assertEquals(1623588891566L, dateModel.date4.getTime());
+        Assertions.assertEquals(1623513600000L, dateModel.date5.getTime());
+
+        Assertions.assertEquals(1623588891566L, dateModel.date6.getTime());
+        Assertions.assertEquals(1623588891566L, dateModel.date7.getTime());
+        Assertions.assertEquals(1623588891566L, dateModel.date8.getTime());
+        Assertions.assertEquals(46491000L, dateModel.date9.getTime());
     }
 
     @Test

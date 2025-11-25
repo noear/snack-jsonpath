@@ -38,6 +38,7 @@ public class ONodeAttrHolder {
     private String description;
 
     private String format;
+    private ZoneId zoneId;
     private TimeZone timezone;
 
     private boolean flat;
@@ -66,7 +67,8 @@ public class ONodeAttrHolder {
 
             format = attrAnno.format();
             if (Asserts.isNotEmpty(attrAnno.timezone())) {
-                timezone = TimeZone.getTimeZone(ZoneId.of(attrAnno.timezone()));
+                zoneId = ZoneId.of(attrAnno.timezone());
+                timezone = TimeZone.getTimeZone(zoneId);
             }
 
             flat = attrAnno.flat();
@@ -119,13 +121,21 @@ public class ONodeAttrHolder {
         return format;
     }
 
+    public ZoneId getZoneId() {
+        return zoneId;
+    }
+
+    /**
+     * @deprecated 4.0
+     * */
+    @Deprecated
     public TimeZone getTimezone() {
         return timezone;
     }
 
     public String formatDate(Date value) {
-        if (getTimezone() != null) {
-            return DateUtil.format(value, getFormat(), getTimezone());
+        if (getZoneId() != null) {
+            return DateUtil.format(value, getFormat(), getZoneId());
         } else {
             return DateUtil.format(value, getFormat());
         }

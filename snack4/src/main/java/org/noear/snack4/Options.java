@@ -33,6 +33,7 @@ public final class Options {
     //默认类型的key
     public static final String DEF_TYPE_PROPERTY_NAME = "@type";
     //默认时区
+    public static final ZoneId DEF_ZONE = ZoneId.systemDefault();
     public static final TimeZone DEF_TIME_ZONE = TimeZone.getDefault();
     //默认偏移时区
     public static final ZoneOffset DEF_OFFSET = OffsetDateTime.now().getOffset();
@@ -62,6 +63,7 @@ public final class Options {
     //允许安全类
     private Locale locale = DEF_LOCALE;
     //时区
+    private ZoneId zoneId = DEF_ZONE;
     private TimeZone timeZone = DEF_TIME_ZONE;
 
     private Supplier<Map> mapFactory = LinkedHashMap::new;
@@ -104,6 +106,14 @@ public final class Options {
         return locale;
     }
 
+    public ZoneId getZoneId() {
+        return zoneId;
+    }
+
+    /**
+     * @deprecated 4.0
+     * */
+    @Deprecated
     public TimeZone getTimeZone() {
         return timeZone;
     }
@@ -190,6 +200,7 @@ public final class Options {
             throw new UnsupportedOperationException(DEF_UNSUPPORTED_HINT);
         }
 
+        this.zoneId = timeZone.toZoneId();
         this.timeZone = timeZone;
         return this;
     }
@@ -202,6 +213,7 @@ public final class Options {
             throw new UnsupportedOperationException(DEF_UNSUPPORTED_HINT);
         }
 
+        this.zoneId = zoneId;
         this.timeZone = TimeZone.getTimeZone(zoneId);
         return this;
     }
