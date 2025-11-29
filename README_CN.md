@@ -11,9 +11,7 @@
     <a href="https://solon.noear.org/article/snack" target="_blank">https://solon.noear.org/article/snack</a>
 </p>
 <p align="center">
-    <a target="_blank" href="https://deepwiki.com/noear/snack-jsonpath">
-        <img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki" />
-    </a>
+    <a href="https://deepwiki.com/noear/snackjson"><img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki"></a>
     <a target="_blank" href="https://central.sonatype.com/artifact/org.noear/snack4">
         <img src="https://img.shields.io/maven-central/v/org.noear/snack4.svg?label=Maven%20Central" alt="Maven" />
     </a>
